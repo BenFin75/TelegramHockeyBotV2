@@ -8,11 +8,11 @@ def setup(update, context, updater, chat_database):
 
     team_ids = []
 
-    userid = update.effective_chat.id
+    chat_id = update.effective_chat.id
     
-    if userid > 0:
+    if chat_id > 0:
         chatname = update.message.chat.username
-    if userid < 0:
+    if chat_id < 0:
         chatname = update.message.chat.title
 
     def message(update, context: CallbackContext):
@@ -68,11 +68,10 @@ def setup(update, context, updater, chat_database):
                 InlineKeyboardButton("Done", callback_data='done'),
             ]
         ])
-        update.message.reply_text(
+        updater.bot.sendMessage(chat_id, text=(
             f'Hello {update.effective_user.first_name}, What teams would you like notifications for?'
-            + "\n" + "When all teams have been added, click Done",
-            reply_markup=reply_buttons
-        )
+            + "\n" + "When all teams have been added, click Done"),
+            reply_markup=reply_buttons)
 
     def setup_button(update, context: CallbackContext):
         """
@@ -91,8 +90,8 @@ def setup(update, context, updater, chat_database):
             context.bot.deleteMessage(
                 update.callback_query.message.chat.id, update.callback_query.message.message_id)
             setup_msg = ('Your team preferences have been updated!')
-            context.bot.send_message(chat_id=userid, text=setup_msg)
-            database_functions.update_teams(chat_database, chatname, team_ids, userid)
+            context.bot.send_message(chat_id, text=setup_msg)
+            database_functions.update_teams(chat_database, chatname, team_ids, chat_id)
             team_ids.clear()
             # game(update, context)
             notifications(context)
@@ -106,8 +105,8 @@ def setup(update, context, updater, chat_database):
             )
             context.bot.deleteMessage(
                 update.callback_query.message.chat.id, update.callback_query.message.message_id)
-            updater.bot.sendMessage(chat_id=userid, text="You will receive Notifications!")
-            database_functions.update_notifications(chat_database, userid, notification_prefrence)
+            updater.bot.sendMessage(chat_id, text="You will receive Notifications!")
+            database_functions.update_notifications(chat_database, chat_id, notification_prefrence)
 
         # The button handler for turning off notifications for a user
         if update.callback_query.data == 'no':
@@ -118,8 +117,8 @@ def setup(update, context, updater, chat_database):
             )
             context.bot.deleteMessage(
                 update.callback_query.message.chat.id, update.callback_query.message.message_id)
-            updater.bot.sendMessage(chat_id=userid, text="You will not receive Notifications!")
-            database_functions.update_notifications(chat_database, userid, notification_prefrence)
+            updater.bot.sendMessage(chat_id=chat_id, text="You will not receive Notifications!")
+            database_functions.update_notifications(chat_database, chat_id, notification_prefrence)
 
         # adds the users team selection to their list of followed teams
         other_buttons = ['done', 'yes', 'no']
@@ -134,7 +133,7 @@ def setup(update, context, updater, chat_database):
         """
         # this needs to be global because the handler for the buttons cant be passed variables
         chats_dataframe = pd.read_csv(chat_database)
-        user_is_in_database = chats_dataframe.index[chats_dataframe['ChatID'] == userid].values
+        user_is_in_database = chats_dataframe.index[chats_dataframe['ChatID'] == chat_id].values
         if user_is_in_database.size > 0:
             reply_buttons = InlineKeyboardMarkup([
                 [
@@ -142,11 +141,11 @@ def setup(update, context, updater, chat_database):
                     InlineKeyboardButton("No", callback_data='no')
                 ],
             ])
-            updater.bot.sendMessage(chat_id=userid, text=(
+            updater.bot.sendMessage(chat_id, text=(
                 'Would you like daily game notifications?' + "\n" + "Notifications are sent at 8am est."), reply_markup=reply_buttons
             )
             return False
-        updater.bot.sendMessage(chat_id=userid,
+        updater.bot.sendMessage(chat_id,
                                 text="Please run /setup first!")
 
     dispatcher = updater.dispatcher
