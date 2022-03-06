@@ -6,10 +6,10 @@ import pandas as pd
 def remove(update, context, updater, chat_database):
 
     def message(update, context: CallbackContext):
-        chatid = update.effective_chat.id
+        chat_id = update.effective_chat.id
 
         chats_dataframe = pd.read_csv(chat_database)
-        notiexists = chats_dataframe.index[chats_dataframe['ChatID'] == chatid].values
+        notiexists = chats_dataframe.index[chats_dataframe['ChatID'] == chat_id].values
         if notiexists.size > 0:
             reply_buttons = InlineKeyboardMarkup([
                 [
@@ -17,11 +17,10 @@ def remove(update, context, updater, chat_database):
                     InlineKeyboardButton("No", callback_data='stay')
                 ],
             ])
-            updater.bot.sendMessage(chat_id=chatid,
+            updater.bot.sendMessage(chat_id,
                                     text='Are you sure you would like to delete your team and notifications data?', reply_markup=reply_buttons)
             return
-        updater.bot.sendMessage(chat_id=update.effective_chat.id,
-                                text="You have no data! Run /Setup to start!")
+        updater.bot.sendMessage(chat_id, text="You have no data! Run /Setup to start!")
         return
 
 
@@ -30,11 +29,11 @@ def remove(update, context, updater, chat_database):
             This is the handler for the buttons called in other funtions
             When the buttons are clicked this function receives the output
         """
-        chatid = update.effective_chat.id
+        chat_id = update.effective_chat.id
 
         if update.callback_query.data == 'bye':
             chats_dataframe = pd.read_csv(chat_database)
-            chats_dataframe_without_user = chats_dataframe[chats_dataframe['ChatID'] != chatid]
+            chats_dataframe_without_user = chats_dataframe[chats_dataframe['ChatID'] != chat_id]
             chats_dataframe_without_user.to_csv(chat_database, index=False, header=True)
             update.callback_query.answer()
             update.callback_query.message.edit_reply_markup(
@@ -42,7 +41,7 @@ def remove(update, context, updater, chat_database):
             )
             context.bot.deleteMessage(
                 update.callback_query.message.chat.id, update.callback_query.message.message_id)
-            updater.bot.sendMessage(chat_id=chatid, text="Your team and notification data has been deleted." +
+            updater.bot.sendMessage(chat_id, text="Your team and notification data has been deleted." +
                                     "\n" + "You can run /setup to start again." + "\n" + "Thanks for using my bot, bye!")
 
         if update.callback_query.data == 'stay':
@@ -53,7 +52,7 @@ def remove(update, context, updater, chat_database):
             context.bot.deleteMessage(
                 update.callback_query.message.chat.id, update.callback_query.message.message_id)
             updater.bot.sendMessage(
-                chat_id=chatid, text="Your team and notification data are safe")
+                chat_id, text="Your team and notification data are safe")
     
     dispatcher = updater.dispatcher
     #adds the handler only for the callback data of bye or stay
