@@ -14,12 +14,16 @@ import help_bot
 import setup_user
 import status
 import remove_user
+import game_check_request
 import next_game_check
+import last_game_check
 import standings
 import roster
 import player
 import stats
 import cupcheck
+import daily_notifications
+import game_time_notifications
 import stop_bot
 import unknown_message
 
@@ -50,34 +54,35 @@ dst_check = bool(datetime.now(pytz.timezone(time_zone)).dst())
 
 
 # handles sending the message to the user
-def send_message(update, message):
+def send_message(chat_id, message):
 
     if (type(message) == list):
-        if (type(message) != str):
             for n in message:
-                updater.bot.sendMessage(chat_id=update.effective_chat.id,
-                                        text=f'<pre>{n}</pre>', parse_mode=ParseMode.HTML)
-        else:
-            for n in message:
-                updater.bot.send_message(
-                    chat_id=update.effective_chat.id, text=n, disable_web_page_preview=1)
+                if (type(n) != str):
+                    updater.bot.sendMessage(chat_id,
+                                            text=f'<pre>{n}</pre>', parse_mode=ParseMode.HTML)
+                else:
+                    updater.bot.send_message(chat_id,
+                                            text=n, disable_web_page_preview=1)
         
     elif (type(message) != str):
-        updater.bot.sendMessage(chat_id=update.effective_chat.id,
+        updater.bot.sendMessage(chat_id,
                                 text=f'<pre>{message}</pre>', parse_mode=ParseMode.HTML)
     else:
         updater.bot.send_message(
-            chat_id=update.effective_chat.id, text=message, disable_web_page_preview=1)
+            chat_id, text=message, disable_web_page_preview=1)
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
+    chat_id=update.effective_chat.id
     message = start_bot.message()
-    send_message(update, message)
+    send_message(chat_id, message)
 
 # returns a list of commands and bot info
 def help(update, context):
+    chat_id=update.effective_chat.id
     message = help_bot.message()
-    send_message(update, message)
+    send_message(chat_id, message)
 
 # sets up the teams a user is following and their notification status
 def user_setup(update, context):
@@ -85,73 +90,121 @@ def user_setup(update, context):
 
 # returns a list of the teams a user is following and weither they are receiving notifications or not
 def user_status(update, context):
-    chatid = update.effective_chat.id
-    message = status.message(chatid, chat_database, teams_database)
-    send_message(update, message)
+    chat_id = update.effective_chat.id
+    message = status.message(chat_id, chat_database, teams_database)
+    send_message(chat_id, message)
 
 def user_remove(update, context):
     remove_user.remove(update, context, updater, chat_database)
 
 def check_game(update, context):
-    chatid = update.effective_chat.id
-    user_request = update.message.text[10:].lower()
-    message = (user_request, teams_database, dst_check, todays_date)
-    send_message(update, message)
+    chat_id = update.effective_chat.id
+    message = game_check_request.message(chat_database, chat_id, todays_date, dst_check)
+    send_message(chat_id, message)
 
 def check_next_game(update, context):
+    chat_id=update.effective_chat.id
     user_request = update.message.text[10:].lower()
     message = next_game_check.message(user_request, teams_database, dst_check, todays_date)
-    send_message(update, message)
+    send_message(chat_id, message)
 
-# def check_last_game(update, context):
-
+def check_last_game(update, context):
+    chat_id=update.effective_chat.id
+    user_request = update.message.text[10:].lower()
+    message = last_game_check.message(user_request, teams_database)
+    send_message(chat_id, message)
+    
 # returns the division standings for one or all divisions as requested by the user
 def check_standings(update, context):
+    chat_id=update.effective_chat.id
     user_request = update.message.text[11:].lower()
     messages = standings.message(user_request)
-    send_message(update, messages)
+    send_message(chat_id, messages)
 
 # returns the roster for a requested team
 def check_roster(update, context):
+    chat_id=update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = roster.message(user_request, teams_database)
-    print(type(message))
-    send_message(update, message)
+    send_message(chat_id, message)
 
 # returns a players name and position based on their jersey number
 def check_player(update, context):
+    chat_id=update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = player.message(user_request, teams_database)
-    send_message(update, message)
+    send_message(chat_id, message)
 
 # returns the stats or a player or team as requested by the user
 def check_stats(update, context):
+    chat_id=update.effective_chat.id
     user_request = update.message.text[7:].lower()
     message = stats.message(user_request, teams_database)
-    send_message(update, message)
+    send_message(chat_id, message)
 
 # returns the days since the flyers and pens have won the cup, LGP!
 def check_cupcheck(update, context):
+    chat_id=update.effective_chat.id
     message = cupcheck.message(todays_date)
-    send_message(update, message)
+    send_message(chat_id, message)
 
 #### ADMIN COMMANDS ###
 
 # runs the daily notification command for testing
-# def test_automatic_notifications(update, context):
+def test_daily_notifications(update, context):
+    chat_id = update.effective_chat.id
+    from_timer = False
+    daily_notifications.run(chat_id, admin_chat_id, chat_database, from_timer, todays_games_database)
+
+def test_gametime_notifications(update, context):
+    chat_id = update.effective_chat.id
+    from_timer = False
+    game_time_notifications.test(chat_id, admin_chat_id, chat_database, from_timer, todays_games_database)
 
 # creates the list of games for the day for testing
 # def create_game_list(update, context):
 
 # stops the bot program
 def stop(update, context):
-    stop_bot.command(update, context, updater, admin_chat_id)
+    stop_bot.command(update, updater, admin_chat_id)
 
 # handles unknown commands submitted to the bot
 def unknown(update, context):
+    chat_id=update.effective_chat.id
     message = unknown_message.message()
-    send_message(update, message)
+    send_message(chat_id, message)
 
+### Automation Functions ###
+
+def timer():
+    """
+        Send notification at 8am every day
+    """
+    x = datetime.today()
+    y = x.replace(day=x.day, hour=8, minute=0, second=0,
+                  microsecond=0) + timedelta(days=1)
+    delta_t = y-x
+
+    secs = delta_t.total_seconds()
+
+    from_timer = True
+    t = Timer(secs, daily_notifications.run(chat_database, from_timer, todays_games_database))
+    t.start()
+
+
+# def dailynotiftimer():
+#     """
+#         Checks if there is a game in the next ten minutes every ten minutes
+#     """
+#     x = datetime.today()
+#     secs = 600
+#     current_hour = int(x.strftime('%H'))
+#     if current_hour >= 9 and current_hour <= 24:
+#         t = Timer(secs, game_time_notifications.game_check(todays_games_database))
+#         t.start()
+#     else:
+#         t = Timer(secs, dailynotiftimer)
+#         t.start()
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
@@ -166,9 +219,9 @@ dispatcher.add_handler(CommandHandler('status', user_status))
 dispatcher.add_handler(CommandHandler('removeme', user_remove))
 
 # commands that check game times and scores
-# dispatcher.add_handler(CommandHandler('game', check_game))
+dispatcher.add_handler(CommandHandler('game', check_game))
 dispatcher.add_handler(CommandHandler('nextgame', check_next_game))
-# dispatcher.add_handler(CommandHandler('lastgame', check_last_game))
+dispatcher.add_handler(CommandHandler('lastgame', check_last_game))
 
 # commands that check season long information
 dispatcher.add_handler(CommandHandler('standings', check_standings))
@@ -178,13 +231,13 @@ dispatcher.add_handler(CommandHandler('stats', check_stats))
 dispatcher.add_handler(CommandHandler('cupcheck', check_cupcheck))
 
 # admin/debugging commands
-# dispatcher.add_handler(CommandHandler('testautonotify', test_automatic_notifications))
+dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
+# dispatcher.add_handler(CommandHandler('testautonotify', test_gametime_notifications))
 # dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('stop', stop))
 
 # handles unknown messages
 dispatcher.add_handler(MessageHandler(Filters.command, unknown))
-
 
 
 # starts the bot
