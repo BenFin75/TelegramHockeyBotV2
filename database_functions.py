@@ -1,12 +1,11 @@
 import pandas as pd
 
-
-def team_check(team_name, teamsdb):
+def team_check(team_name, teams_database):
     """
         Sends a message if the user submits an unsupported team name
     """
-    teamdf = pd.read_csv(teamsdb, index_col=None)
-    if team_name not in teamdf.TeamName.values:
+    team_dataframe = pd.read_csv(teams_database, index_col=None)
+    if team_name not in team_dataframe.TeamName.values:
         return False
     else:
         return True
