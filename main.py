@@ -4,11 +4,11 @@ from telegram.ext import *
 import pandas as pd
 from pathlib import Path, PureWindowsPath
 import os
-from datetime import datetime, timedelta, date
-from threading import Timer
+from datetime import datetime, date
 import pytz
 
 # my scripts
+from handle_messages import send_message
 import start_bot
 import help_bot
 import setup_user
@@ -51,38 +51,20 @@ admin_chat_id = 110799848
 todays_date = date.today()
 time_zone = 'US/Eastern'
 dst_check = bool(datetime.now(pytz.timezone(time_zone)).dst())
+starting = True
 
-
-# handles sending the message to the user
-def send_message(chat_id, message):
-
-    if (type(message) == list):
-            for n in message:
-                if (type(n) != str):
-                    updater.bot.sendMessage(chat_id,
-                                            text=f'<pre>{n}</pre>', parse_mode=ParseMode.HTML)
-                else:
-                    updater.bot.send_message(chat_id,
-                                            text=n, disable_web_page_preview=1)
-        
-    elif (type(message) != str):
-        updater.bot.sendMessage(chat_id,
-                                text=f'<pre>{message}</pre>', parse_mode=ParseMode.HTML)
-    else:
-        updater.bot.send_message(
-            chat_id, text=message, disable_web_page_preview=1)
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
     chat_id=update.effective_chat.id
     message = start_bot.message()
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 # returns a list of commands and bot info
 def help(update, context):
     chat_id=update.effective_chat.id
     message = help_bot.message()
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 # sets up the teams a user is following and their notification status
 def user_setup(update, context):
@@ -92,7 +74,7 @@ def user_setup(update, context):
 def user_status(update, context):
     chat_id = update.effective_chat.id
     message = status.message(chat_id, chat_database, teams_database)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 def user_remove(update, context):
     remove_user.remove(update, context, updater, chat_database)
@@ -100,53 +82,53 @@ def user_remove(update, context):
 def check_game(update, context):
     chat_id = update.effective_chat.id
     message = game_check_request.message(chat_database, chat_id, todays_date, dst_check)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 def check_next_game(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[10:].lower()
     message = next_game_check.message(user_request, teams_database, dst_check, todays_date)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 def check_last_game(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[10:].lower()
     message = last_game_check.message(user_request, teams_database)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
     
 # returns the division standings for one or all divisions as requested by the user
 def check_standings(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[11:].lower()
     messages = standings.message(user_request)
-    send_message(chat_id, messages)
+    send_message(updater, chat_id, messages)
 
 # returns the roster for a requested team
 def check_roster(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = roster.message(user_request, teams_database)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 # returns a players name and position based on their jersey number
 def check_player(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = player.message(user_request, teams_database)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 # returns the stats or a player or team as requested by the user
 def check_stats(update, context):
     chat_id=update.effective_chat.id
     user_request = update.message.text[7:].lower()
     message = stats.message(user_request, teams_database)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 # returns the days since the flyers and pens have won the cup, LGP!
 def check_cupcheck(update, context):
     chat_id=update.effective_chat.id
     message = cupcheck.message(todays_date)
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 #### ADMIN COMMANDS ###
 
@@ -154,7 +136,7 @@ def check_cupcheck(update, context):
 def test_daily_notifications(update, context):
     chat_id = update.effective_chat.id
     from_timer = False
-    daily_notifications.run(chat_id, admin_chat_id, chat_database, from_timer, todays_games_database)
+    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, from_timer, todays_games_database, dst_check)
 
 def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
@@ -172,25 +154,14 @@ def stop(update, context):
 def unknown(update, context):
     chat_id=update.effective_chat.id
     message = unknown_message.message()
-    send_message(chat_id, message)
+    send_message(updater, chat_id, message)
 
 ### Automation Functions ###
+def start_notifications():
+    print('main')
+    daily_notifications.start_timer(updater, chat_database, todays_games_database, dst_check)
 
-def timer():
-    """
-        Send notification at 8am every day
-    """
-    x = datetime.today()
-    y = x.replace(day=x.day, hour=8, minute=0, second=0,
-                  microsecond=0) + timedelta(days=1)
-    delta_t = y-x
-
-    secs = delta_t.total_seconds()
-
-    from_timer = True
-    t = Timer(secs, daily_notifications.run(chat_database, from_timer, todays_games_database))
-    t.start()
-
+start_notifications()
 
 # def dailynotiftimer():
 #     """

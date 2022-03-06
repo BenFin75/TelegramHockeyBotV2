@@ -13,7 +13,6 @@ def check(number_of_teams, team_data, dst_check):
     game_messages = []
     while number_of_teams > 0:
         number_of_teams = number_of_teams - 1
-
         # the encoding is so that Montréal has its é, can't forget that
         away_team = json.dumps(team_data['dates'][0]['games'][number_of_teams]
                                ['teams']['away']['team']['name'], ensure_ascii=False).encode('utf8')
@@ -43,8 +42,8 @@ def check(number_of_teams, team_data, dst_check):
         game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')
         playoff_check = json.dumps(
             team_data['dates'][0]['games'][0]['gameType']).strip('\"')
+        
         if playoff_check == 'P':
-
             away_wins_int = int(away_wins)
             home_wins_int = int(home_wins)
             away_games_won = away_wins_int % 4
@@ -77,6 +76,7 @@ def check(number_of_teams, team_data, dst_check):
                     message = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
                                       "The series is tied at " + home_games_won_str + " games!")
                 game_messages.append(message)
+                
         if playoff_check == 'R':
             away_ot = json.dumps(
                 team_data['dates'][0]['games'][number_of_teams]['teams']['away']['leagueRecord']['ot'])
