@@ -3,16 +3,16 @@ import requests
 import pandas as pd
 import json
 from datetime import datetime, timedelta, date
-from dateutil.relativedelta import relativedelta
+
 
 todays_date = date.today()
 
 import database_functions
+import api_checks
 
 
 
 def message(user_request, teams_database, dst_check, todays_date):
-    print(user_request)
     if len(user_request) == 0:
         return_message = "Please indicate the team you want the next game for." + '\n' + "e.g. /nextgame Pens"
 
@@ -29,7 +29,7 @@ def message(user_request, teams_database, dst_check, todays_date):
                 last_game['teams'][0]['previousGameSchedule']['dates'][0]['games'][0]['gameType']).strip('\"')
             elimcheck = json.dumps(next_game['teams'][0])
 
-            if not seasoncheck(todays_date):
+            if not api_checks.season(todays_date):
                 return_message = ("The NHL season has ended, come back next year!")
             elif 'nextGameSchedule' not in elimcheck:
                 return_message = eliminated(team_dataframe, team_id, last_game, playoff_check)
@@ -148,14 +148,3 @@ def build_message(next_game, dst_check):
     
     return message
 
-def seasoncheck(todays_date):
-    """
-        checks if the nhl is currently in season by seening if there are any games this month
-    """
-    a_month_from_now = todays_date + relativedelta(months=1)
-    json = requests.get(f'https://statsapi.web.nhl.com/api/v1/schedule?startDate={todays_date}&endDate={a_month_from_now}').json()
-    numofgame = json['totalItems']
-    if numofgame == 0:
-        return False
-    else:
-        return True
