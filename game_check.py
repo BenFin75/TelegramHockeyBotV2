@@ -1,13 +1,16 @@
-def message():
-    print('ethan is cringe!')
+import requests
+import json
+from datetime import datetime, timedelta
 
-def gamecheck(chat_id_set, number_of_teams, team_data):
+def check(number_of_teams, team_data, dst_check):
     """
-        The core function for returning the game description
-        for the teams being followed by the user
-        /game and the automatic notifications use this funtion
-        for sending messages
+    The core function for returning the game description
+    for the teams being followed by the user
+    /game and the automatic notifications use this funtion
+    for sending messages
     """
+    
+    game_messages = []
     while number_of_teams > 0:
         number_of_teams = number_of_teams - 1
 
@@ -58,30 +61,29 @@ def gamecheck(chat_id_set, number_of_teams, team_data):
             tie_check = away_games_won - home_games_won
             if tie_check != 0:
                 if leading_games == 1:
-                    game_check_msg = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
+                    message = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
                                       "The " + leading_team + " Lead " + leading_games + " game to " + trailing_games + "!")
                 else:
-                    game_check_msg = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
+                    message = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
                                       "The " + leading_team + " Lead " + leading_games + " games to " + trailing_games + "!")
-                updater.bot.sendMessage(
-                    chat_id=chat_id_set, text=game_check_msg)
+                game_messages.append(message)
 
             if tie_check == 0:
                 home_games_won_str = str(home_games_won)
                 if home_games_won == 1:
-                    game_check_msg = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
+                    message = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
                                       "The series is tied at " + home_games_won_str + " game!")
                 else:
-                    game_check_msg = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
+                    message = ("The " + home_team_dec + "\n" + "Host" + "\n" + "The " + away_team_dec + "\n" + "At " + game_time_est + " est!" + "\n" +
                                       "The series is tied at " + home_games_won_str + " games!")
-                updater.bot.sendMessage(
-                    chat_id=chat_id_set, text=game_check_msg)
+                game_messages.append(message)
         if playoff_check == 'R':
             away_ot = json.dumps(
                 team_data['dates'][0]['games'][number_of_teams]['teams']['away']['leagueRecord']['ot'])
             home_ot = json.dumps(
                 team_data['dates'][0]['games'][number_of_teams]['teams']['home']['leagueRecord']['ot'])
-            game_check_msg = ("The " + home_team_dec + " (" + home_wins + "," + home_losses + "," + home_ot + ")" + "\n" + "Host" + "\n" + "The " + away_team_dec + " (" + away_wins +
+            message = ("The " + home_team_dec + " (" + home_wins + "," + home_losses + "," + home_ot + ")" + "\n" + "Host" + "\n" + "The " + away_team_dec + " (" + away_wins +
                               "," + away_losses + "," + away_ot + ")" + "\n" + "at " + game_time_est + " est!")
-            updater.bot.sendMessage(chat_id=chat_id_set, text=game_check_msg)
-    return
+            game_messages.append(message)
+            
+    return game_messages
