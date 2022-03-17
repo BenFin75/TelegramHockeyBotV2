@@ -1,8 +1,8 @@
 import pandas as pd
-import requests
 import json
 
 import database_functions
+import api_checks
 
 def message(user_request, teams_database):
     """
@@ -26,12 +26,12 @@ def message(user_request, teams_database):
             teamid_last = int(
                 last_dataframe.loc[last_dataframe.TeamName == user_request, 'TeamID'].values)
 
-            last_game = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{teamid_last}?expand=team.schedule.previous').json()
+            last_game = api_checks.team_call(f'{teamid_last}?expand=team.schedule.previous')
 
             game_pk = json.dumps(
                 last_game['teams'][0]['previousGameSchedule']['dates'][0]['games'][0]['gamePk'])
             
-            last_game_stats = requests.get(f'https://statsapi.web.nhl.com/api/v1/game/{game_pk}/feed/live').json()
+            last_game_stats = api_checks.game_call(f'{game_pk}/feed/live')
 
             # the encoding is so that Montréal has its é, can't forget that
             home_team = json.dumps(last_game_stats['liveData']['linescore']['teams']

@@ -1,5 +1,3 @@
-from pyexpat.errors import messages
-import requests
 import pandas as pd
 import json
 from datetime import datetime, timedelta, date
@@ -22,8 +20,8 @@ def message(user_request, teams_database, dst_check, todays_date):
         else:
             team_dataframe = pd.read_csv(teams_database, index_col=None)
             team_id = int(team_dataframe.loc[team_dataframe.TeamName == user_request, 'TeamID'].values)
-            next_game = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{team_id}?expand=team.schedule.next').json()
-            last_game = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{team_id}?expand=team.schedule.previous').json()
+            next_game = api_checks.team_call(f'{team_id}?expand=team.schedule.next')
+            last_game = api_checks.team_call(f'{team_id}?expand=team.schedule.previous')
 
             playoff_check = json.dumps(
                 last_game['teams'][0]['previousGameSchedule']['dates'][0]['games'][0]['gameType']).strip('\"')

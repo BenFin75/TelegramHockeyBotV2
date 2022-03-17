@@ -135,13 +135,11 @@ def check_cupcheck(update, context):
 # runs the daily notification command for testing
 def test_daily_notifications(update, context):
     chat_id = update.effective_chat.id
-    from_timer = False
-    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, from_timer, todays_games_database, dst_check)
+    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check)
 
 def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
-    from_timer = False
-    game_time_notifications.test(chat_id, admin_chat_id, chat_database, from_timer, todays_games_database)
+    game_time_notifications.test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date)
 
 # creates the list of games for the day for testing
 # def create_game_list(update, context):
@@ -157,25 +155,12 @@ def unknown(update, context):
     send_message(updater, chat_id, message)
 
 ### Automation Functions ###
-def start_notifications():
-    print('main')
-    daily_notifications.start_timer(updater, chat_database, todays_games_database, dst_check)
+def start_notifications(starting):
+    if starting == True:
+        starting = False
+        daily_notifications.start_timer(updater, chat_database, todays_games_database, dst_check)
 
-start_notifications()
-
-# def dailynotiftimer():
-#     """
-#         Checks if there is a game in the next ten minutes every ten minutes
-#     """
-#     x = datetime.today()
-#     secs = 600
-#     current_hour = int(x.strftime('%H'))
-#     if current_hour >= 9 and current_hour <= 24:
-#         t = Timer(secs, game_time_notifications.game_check(todays_games_database))
-#         t.start()
-#     else:
-#         t = Timer(secs, dailynotiftimer)
-#         t.start()
+# start_notifications(starting)
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
@@ -203,7 +188,7 @@ dispatcher.add_handler(CommandHandler('cupcheck', check_cupcheck))
 
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
-# dispatcher.add_handler(CommandHandler('testautonotify', test_gametime_notifications))
+dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
 # dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('stop', stop))
 

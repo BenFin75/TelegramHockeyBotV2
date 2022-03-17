@@ -1,8 +1,8 @@
-import requests
 import pandas as pd
 import json
 
 import database_functions
+import api_checks
 
 def message(user_request, teams_database):
     """
@@ -42,7 +42,7 @@ def build_response(teams_database, team_name, player_info):
     teamdf = pd.read_csv(teams_database, index_col=None)
     teamID = int(teamdf.loc[teamdf.TeamName == team_name, 'TeamID'])
 
-    team_data = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{teamID}?expand=team.roster').json()
+    team_data = api_checks.team_call(f'{teamID}?expand=team.roster')
 
     roster = team_data['teams'][0]['roster']['roster']
     team = json.dumps(team_data['teams'][0]['name'],

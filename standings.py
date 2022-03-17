@@ -1,10 +1,11 @@
-import requests
 import prettytable as pt
+
+import api_checks
 
 def message(user_request):
 
     # get the division standings from API
-    standings = requests.get('https://statsapi.web.nhl.com/api/v1/standings').json()
+    standings = api_checks.standings_call()
     
     #initiate return_message as a list so it can be appended to
     return_message = []

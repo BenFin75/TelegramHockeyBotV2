@@ -1,9 +1,9 @@
-import requests
 import prettytable as pt
 import pandas as pd
 import json
 
 import database_functions
+import api_checks
 
 def message(user_request, teams_database):
 
@@ -52,7 +52,7 @@ def player_request(team_name, player_info, teams_database):
     if player_info.isnumeric():
         player_info = int(player_info)
 
-    player_data = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{teamID}?expand=team.roster').json()
+    player_data = api_checks.team_call(f'{teamID}?expand=team.roster')
 
     team = json.dumps(
         player_data['teams'][0]['name'], ensure_ascii=False).encode('utf8')
@@ -88,7 +88,7 @@ def check_if_player_exists(player_data, player_info):
 
 def build_response(player_id, player_name, position):
 
-    player_stats = requests.get(f'https://statsapi.web.nhl.com/api/v1/people/{player_id}/stats?stats=statsSingleSeason').json()
+    player_stats = api_checks.player_call(f'{player_id}/stats?stats=statsSingleSeason')
     
     if position == "G":
         table = pt.PrettyTable(
@@ -138,7 +138,7 @@ def team_request(team_name, teams_database):
     team_dataframe = pd.read_csv(teams_database, index_col=None)
     team_id = int(team_dataframe.loc[team_dataframe.TeamName == team_name, 'TeamID'])
 
-    team_data = requests.get(f'https://statsapi.web.nhl.com/api/v1/teams/{team_id}/stats').json()
+    team_data = api_checks.team_call(f'{team_id}/stats')
     
     team = json.dumps(team_data['stats'][0]['splits'][0]
                         ['team']['name'], ensure_ascii=False).encode('utf8')
@@ -152,7 +152,7 @@ def team_request(team_name, teams_database):
     points = json.dumps(team_data['stats'][0]['splits'][0]['stat']['pts'])
 
 
-    team_standings = requests.get('https://statsapi.web.nhl.com/api/v1/standings').json()
+    team_standings = api_checks.standings_call()
 
     for n in team_standings['records']:
         for x in n['teamRecords']:

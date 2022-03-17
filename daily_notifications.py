@@ -1,15 +1,15 @@
 import pandas as pd
-from datetime import datetime, timedelta, date
-import requests
+from datetime import date
 import json
-from threading import Timer
+import schedule
+import time
 
 from handle_messages import send_message
 import api_checks
 # import game_time_notifications
 import game_check
 
-def run(updater, chat_database, from_timer, todays_games_database, dst_check):
+def run(updater, chat_database, todays_games_database, dst_check):
     """
         Handles the inital data for the daily notifications
         and restarts the timer for the next day at 8am
@@ -19,7 +19,7 @@ def run(updater, chat_database, from_timer, todays_games_database, dst_check):
     chats_to_notify = list(
         chat_dataframe.loc[chat_dataframe['Notifications'] == 1, 'ChatID'])
 
-    todays_games = requests.get(f'https://statsapi.web.nhl.com/api/v1/schedule?date={todays_date}').json()
+    todays_games = api_checks.schedule_call(f'date={todays_date}')
 
     while len(chats_to_notify) > 0:
         chat_id = chats_to_notify[0]
@@ -29,9 +29,6 @@ def run(updater, chat_database, from_timer, todays_games_database, dst_check):
         del chats_to_notify[0]
     # create csv for game time notifications
     # game_time_notifications.create_csv(todays_games, todays_games_database)
-    
-    if from_timer:
-        timer(updater, chat_database, todays_games_database, dst_check)
 
 def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_check):
     """
@@ -56,7 +53,7 @@ def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_che
     non_postponed_teams = (',').join(api_checks.postponed(string_of_playing_teams, todays_date))
     if not non_postponed_teams:
         return False
-    team_data = requests.get(f'https://statsapi.web.nhl.com/api/v1/schedule?teamId={non_postponed_teams}&date={todays_date}').json()
+    team_data = api_checks.schedule_call(f'teamId={non_postponed_teams}&date={todays_date}')
     number_of_teams = int(json.dumps(team_data['totalGames']))
     
     if api_checks.season(todays_date):
@@ -68,32 +65,29 @@ def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_che
             return False
     else:
         return False
+
+def timer(updater, chat_database, todays_games_database, dst_check):
+    """
+        Send notification at 8am every day
+    """
+    schedule.every().day.at("23:32").do(run, updater, chat_database, todays_games_database, dst_check)
     
-def test(updater, chat_id, admin_chat_id, chat_database, from_timer, todays_games_database, dst_check):
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+    
+def start_timer(updater, chat_database, todays_games_database, dst_check):
+    timer(updater, chat_database, todays_games_database, dst_check)
+    
+    
+    
+def test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check):
     """
     DEBUGING FUCTION  
         runs the daily notifications on command
     """
     if chat_id == admin_chat_id:
         send_message(updater, chat_id, 'Testing Automatic Notifications')
-        run(updater, chat_database, from_timer, todays_games_database, dst_check)
+        run(updater, chat_database, todays_games_database, dst_check)
     else:
         return
-
-def timer(updater, chat_database, todays_games_database, dst_check):
-    """
-        Send notification at 8am every day
-    """
-    x = datetime.today()
-    y = x.replace(day=x.day, hour=8, minute=0, second=0,
-                  microsecond=0) + timedelta(days=1)
-    delta_t = y-x
-
-    secs = delta_t.total_seconds()
-    print(dst_check)
-    from_timer = True
-    t = Timer(5000, run(updater, chat_database, from_timer, todays_games_database, dst_check))
-    t.start()
-    
-def start_timer(updater, chat_database, todays_games_database, dst_check):
-    timer(updater, chat_database, todays_games_database, dst_check)

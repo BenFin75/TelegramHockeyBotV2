@@ -1,4 +1,3 @@
-import requests
 import pandas as pd
 
 import api_checks
@@ -22,7 +21,7 @@ def message(chat_database, chat_id, todays_date, dst_check):
 
         if number_of_teams > 0:
             string_of_playing_teams = ','.join(list_of_playing_teams)
-            team_data = requests.get(f'https://statsapi.web.nhl.com/api/v1/schedule?teamId={string_of_playing_teams}&date={todays_date}').json()
+            team_data = api_checks.schedule_call(f'teamId={string_of_playing_teams}&date={todays_date}')
             message = game_check.check(number_of_teams, team_data, dst_check)
         else:
             message = 'There is not a game today'
