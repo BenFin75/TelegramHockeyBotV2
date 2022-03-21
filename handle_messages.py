@@ -1,20 +1,48 @@
+from email import message
 from telegram import *
+from PIL import Image, ImageDraw, ImageFont
 
 # handles sending the message to the user
-def send_message(updater, chat_id, message):
-
+def send(updater, chat_id, message):
     if (type(message) == list):
             for n in message:
                 if (type(n) != str):
-                    updater.bot.sendMessage(chat_id,
-                                            text=f'<pre>{n}</pre>', parse_mode=ParseMode.HTML)
+                    send_image(updater, chat_id, n)
                 else:
-                    updater.bot.send_message(chat_id,
-                                            text=n, disable_web_page_preview=1)
+                        send_message(updater, chat_id, n)
         
     elif (type(message) != str):
-        updater.bot.sendMessage(chat_id,
-                                text=f'<pre>{message}</pre>', parse_mode=ParseMode.HTML)
+        send_image(updater, chat_id, message)
     else:
-        updater.bot.send_message(
-            chat_id, text=message, disable_web_page_preview=1)
+        send_message(updater, chat_id, message)
+
+def send_message(updater, chat_id, message):
+    updater.bot.send_message(
+        chat_id, text=message, disable_web_page_preview=1)
+
+def send_image(updater, chat_id, table):
+
+    table_string = str(table)
+    n = 0
+    max_length = 0
+    for i in table:
+        length = int(len(str(i))/7)
+        if length > max_length:
+            max_length = length
+        n += 1
+    width = (max_length-2)*10
+    height = (125 + ((n)*21))
+    
+    
+    out = Image.new("RGB", (width, height), ('#182533'))
+
+    # get a font
+    fnt = ImageFont.truetype('./hockeybot-v2/JetBrainsMono-Bold.ttf', 15)
+    # get a drawing context
+    d = ImageDraw.Draw(out)
+
+    # draw multiline text
+    d.multiline_text((15, 4), table_string, font=fnt, fill=('#5889b3'))
+
+    out.save('image.png')
+    updater.bot.send_photo(chat_id, photo=open('./image.png', 'rb'))
