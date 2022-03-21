@@ -22,6 +22,7 @@ import roster
 import player
 import stats
 import cupcheck
+import f1_for_the_fans
 import daily_notifications
 import game_time_notifications
 import stop_bot
@@ -56,13 +57,13 @@ starting = True
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     message = start_bot.message()
     send(updater, chat_id, message)
 
 # returns a list of commands and bot info
 def help(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     message = help_bot.message()
     send(updater, chat_id, message)
 
@@ -85,41 +86,41 @@ def check_game(update, context):
     send(updater, chat_id, message)
 
 def check_next_game(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[10:].lower()
     message = next_game_check.message(user_request, teams_database, dst_check, todays_date)
     send(updater, chat_id, message)
 
 def check_last_game(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[10:].lower()
     message = last_game_check.message(user_request, teams_database)
     send(updater, chat_id, message)
     
 # returns the division standings for one or all divisions as requested by the user
 def check_standings(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[11:].lower()
     messages = standings.message(user_request)
     send(updater, chat_id, messages)
 
 # returns the roster for a requested team
 def check_roster(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = roster.message(user_request, teams_database)
     send(updater, chat_id, message)
 
 # returns a players name and position based on their jersey number
 def check_player(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[8:].lower()
     message = player.message(user_request, teams_database)
     send(updater, chat_id, message)
 
 # returns the stats or a player or team as requested by the user
 def check_stats(update, context):
-    chat_id=update.effective_chat.id
+    chat_id = update.effective_chat.id
     user_request = update.message.text[7:].lower()
     message = stats.message(user_request, teams_database)
     send(updater, chat_id, message)
@@ -128,6 +129,24 @@ def check_stats(update, context):
 def check_cupcheck(update, context):
     chat_id=update.effective_chat.id
     message = cupcheck.message(todays_date)
+    send(updater, chat_id, message)
+
+# returns the next F1 race time and location
+def f1_next(update, context):
+    chat_id = update.effective_chat.id
+    message = f1_for_the_fans.next()
+    send(updater, chat_id, message)
+
+# returns the results from the last F1 race
+def f1_last(update, context):
+    chat_id = update.effective_chat.id
+    message = f1_for_the_fans.last()
+    send(updater, chat_id, message)
+
+# returns the current F1 standings
+def f1_standings(update, context):
+    chat_id = update.effective_chat.id
+    message = f1_for_the_fans.standings()
     send(updater, chat_id, message)
 
 #### ADMIN COMMANDS ###
@@ -185,6 +204,11 @@ dispatcher.add_handler(CommandHandler('roster', check_roster))
 dispatcher.add_handler(CommandHandler('player', check_player))
 dispatcher.add_handler(CommandHandler('stats', check_stats))
 dispatcher.add_handler(CommandHandler('cupcheck', check_cupcheck))
+
+# commands that check F1 information
+dispatcher.add_handler(CommandHandler('f1next', f1_next))
+dispatcher.add_handler(CommandHandler('f1last', f1_last))
+dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
