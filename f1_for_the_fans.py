@@ -1,13 +1,12 @@
+from xml.etree.ElementInclude import include
 import prettytable as pt
 import json
 from datetime import datetime, timedelta
 
 import api_checks
 
-def next():
-  todays_date = '2021-03-18'
-  dst_check = True
-  
+def next(todays_date, dst_check):
+  todays_date = str(todays_date)
   parsed_data = api_checks.f1_current('')
   next_data = parsed_data["MRData"]['RaceTable']['Race']
   
@@ -36,8 +35,7 @@ def next():
       else:
         race_day_txt += ["st", "nd", "rd"][race_day_int % 10 - 1]
           
-      # race_month = datetime.strftime(game_day_obj, '%m')
-      race_month = race_day_obj.strftime("%B");
+      race_month = race_day_obj.strftime("%B")
           
       
       message = f"The next F1 race is at {track_name}" + '\n' + '\n' + f"The race starts at {start_time_est} on {race_day_of_week} the {race_day_txt} of {race_month}"
@@ -49,7 +47,6 @@ def last():
   parsed_data = api_checks.f1_current('/last/results')
   last_data = parsed_data["MRData"]
   
-  # season = last_data['RaceTable']['@season']
   race_number = last_data['RaceTable']['@round']
   gp = last_data['RaceTable']['Race']['RaceName']
   track = last_data['RaceTable']['Race']['Circuit']['CircuitName']
@@ -58,7 +55,7 @@ def last():
   table = pt.PrettyTable()
 
   table.title = f'{gp} at {track} race #: {race_number}'
-  table.field_names = ['Position', 'Driver', 'Team', 'Grid pos', 'Laps', 'Fastest Lap', 'Points']
+  table.field_names = ['Pos.', 'Driver', 'Team', 'Grid pos.', 'Laps', 'Fastest Lap', 'Points']
   table.align['Driver Name'] = "l"
   table.align['Team'] = "l"
   table.align['Fastest Lap'] = "r"
@@ -68,6 +65,8 @@ def last():
     position = driver['@positionText']
     name = driver['Driver']['FamilyName']
     team = driver['Constructor']['Name']
+    if " F1 Team" in team:
+      team = team.replace(' F1 Team', '')
     grid = driver['Grid']
     laps = driver['Laps']
     fastest = driver['FastestLap']['Time']
@@ -89,7 +88,7 @@ def standings():
 
   season = standings_data['@season']
   table.title = f'{season} Season Standings'
-  table.field_names = ['Position', 'Driver Name', 'Team', 'Points', 'Wins']
+  table.field_names = ['Pos.', 'Driver Name', 'Team', 'Points', 'Wins']
   table.align['Driver Name'] = "l"
   table.align['Team'] = "l"
   table.align['Points'] = "r"
@@ -102,7 +101,9 @@ def standings():
     lname = driver['Driver']['FamilyName']
     full_name = fname + ' ' + lname
     team = driver['Constructor']['Name']
-    points = float(driver['@points'])
+    if " F1 Team" in team:
+      team = team.replace(' F1 Team', '')
+    points = driver['@points']
     wins = driver['@wins']
     
     table.add_row([position, full_name, team, points, wins])
