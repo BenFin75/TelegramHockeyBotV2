@@ -42,7 +42,7 @@ def send_image(updater, chat_id, table):
     d = ImageDraw.Draw(out)
 
     # draw multiline text
-    d.multiline_text((15, 4), table_string, font=fnt, fill=('#5889b3'))
+    d.multiline_text((15, 4), table_string, font=fnt, fill=('#e4ecf2'))
 
     out.save('image.png')
     updater.bot.send_photo(chat_id, photo=open('./image.png', 'rb'))
