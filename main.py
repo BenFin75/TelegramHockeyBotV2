@@ -134,7 +134,7 @@ def check_cupcheck(update, context):
 # returns the next F1 race time and location
 def f1_next(update, context):
     chat_id = update.effective_chat.id
-    message = f1_for_the_fans.next()
+    message = f1_for_the_fans.next(todays_date, dst_check)
     send(updater, chat_id, message)
 
 # returns the results from the last F1 race
