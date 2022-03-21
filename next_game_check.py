@@ -93,18 +93,12 @@ def build_message(next_game, dst_check):
     if dst_check == False:
         game_time_obj = datetime.strptime(
             game_time, '%H:%M:%S') - timedelta(hours=5)
-    game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')
+    game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')     
 
-    th_list = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-               16, 17, 18, 29, 20, 24, 25, 26, 27, 28, 29, 30]
-    if game_day_int == 1 or game_day_int == 21 or game_day_int == 31:
-        game_day_txt += 'st'
-    if game_day_int == 2 or game_day_int == 22:
-        game_day_txt += 'nd'
-    if game_day_int == 3 or game_day_int == 23:
-        game_day_txt += 'rd'
-    if game_day_int in th_list:
-        game_day_txt += 'th'
+    if 4 <= game_day_int <= 20 or 24 <= game_day_int <= 30:
+        game_day_txt += "th"
+    else:
+        game_day_txt += ["st", "nd", "rd"][game_day_int % 10 - 1]
 
     playoff_check = json.dumps(
         next_game['teams'][0]['nextGameSchedule']['dates'][0]['games'][0]['gameType']).strip('\"')

@@ -5,7 +5,7 @@ from unidecode import unidecode
 import schedule
 import time
 
-from handle_messages import send_message
+from handle_messages import send
 import api_checks
 
 def create_notification(updater, both_teams, chat_database, todays_date):
@@ -41,7 +41,7 @@ def create_notification(updater, both_teams, chat_database, todays_date):
 
     for i in chat_ids:
         chat_id = int(i)
-        send_message(updater, chat_id, message)
+        send(updater, chat_id, message)
         
         
 
@@ -90,7 +90,7 @@ def test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, 
         runs the game time notifications on command
     """
     if chat_id == admin_chat_id:
-        send_message(updater, chat_id, 'Testing Game Time Notifications')
+        send(updater, chat_id, 'Testing Game Time Notifications')
         todays_games_dataframe = pd.read_csv('./Database/testinggames.csv')
         for game in todays_games_dataframe.iterrows():
             home_team = str(game[1]["HomeIDs"])

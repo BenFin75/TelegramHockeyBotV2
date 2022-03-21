@@ -4,7 +4,7 @@ import json
 import schedule
 import time
 
-from handle_messages import send_message
+from handle_messages import send
 import api_checks
 # import game_time_notifications
 import game_check
@@ -25,7 +25,7 @@ def run(updater, chat_database, todays_games_database, dst_check):
         chat_id = chats_to_notify[0]
         message = get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_check)
         if message:
-            send_message(updater, chat_id, message)
+            send(updater, chat_id, message)
         del chats_to_notify[0]
     # create csv for game time notifications
     # game_time_notifications.create_csv(todays_games, todays_games_database)
@@ -87,7 +87,7 @@ def test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, 
         runs the daily notifications on command
     """
     if chat_id == admin_chat_id:
-        send_message(updater, chat_id, 'Testing Automatic Notifications')
+        send(updater, chat_id, 'Testing Automatic Notifications')
         run(updater, chat_database, todays_games_database, dst_check)
     else:
         return
