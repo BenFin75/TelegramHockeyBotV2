@@ -1,6 +1,7 @@
 from email import message
 from telegram import *
 from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
 
 # handles sending the message to the user
 def send(updater, chat_id, message):
@@ -43,6 +44,6 @@ def send_image(updater, chat_id, table):
 
     # draw multiline text
     d.multiline_text((15, 4), table_string, font=fnt, fill=('#e4ecf2'))
-
-    out.save('image.png')
-    updater.bot.send_photo(chat_id, photo=open('./image.png', 'rb'))
+    
+    out.save('./hockeybot-v2/Database/image.png')
+    updater.bot.send_photo(chat_id, photo=open('./hockeybot-v2/Database/image.png', 'rb'))
