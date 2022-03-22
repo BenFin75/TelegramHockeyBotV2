@@ -37,7 +37,7 @@ dst_check = bool(datetime.now(time_zone).dst())
 
 # gets the bot token from remote database so the code can be made public
 bot_token_dataframe = pd.read_csv((os.path.join(os.path.dirname(os.getcwd()), "TelegramBotTokens.csv")))
-bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot testing'].values)
+bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot'].values)
 bot_token = str(bot_token_dataframe.loc[[bot_index], ['Bot Token']].values).strip("'[]")
 bot = Bot(bot_token)
 
