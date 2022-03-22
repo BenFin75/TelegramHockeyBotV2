@@ -158,23 +158,42 @@ def f1_standings(update, context):
 # runs the daily notification command for testing
 def test_daily_notifications(update, context):
     chat_id = update.effective_chat.id
-    runtime = datetime.now(pytz.timezone(time_zone)) + timedelta(seconds=30)
-    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check, jobs, runtime)
+    if chat_id == admin_chat_id:
+        send(updater, chat_id, 'Testing Daily Time Notifications')
+        runtime = datetime.now(time_zone) + timedelta(seconds=30)
+        daily_notifications.test(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
+    else:
+        return
 
-# def test_gametime_notifications(update, context):
-#     chat_id = update.effective_chat.id
-#     game_time_notifications.test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date)
+def test_gametime_notifications(update, context):
+    chat_id = update.effective_chat.id
+    if chat_id == admin_chat_id:
+        send(updater, chat_id, 'Testing Game Time Notifications')
+        runtime = datetime.now(time_zone) + timedelta(seconds=30)
+        game_time_notifications.test(updater, chat_database, todays_date, jobs, runtime)
+    else:
+        return
 
 # creates the list of games for the day for testing
 def create_game_list(update, context):
     chat_id = update.effective_chat.id
-    todays_games = api_checks.schedule_call(f'date={todays_date}')
-    game_time_notifications.create_csv(updater, todays_games, todays_games_database, chat_database, todays_date, dst_check)
-    send(updater, chat_id, 'Generated csv')
+    if chat_id == admin_chat_id:
+        todays_games = api_checks.schedule_call(f'date={todays_date}')
+        game_time_notifications.create_csv(updater, todays_games, todays_games_database, chat_database, todays_date, dst_check)
+        send(updater, chat_id, 'Generated csv')
+    else:
+        return
 
 # stops the bot program
 def stop(update, context):
-    stop_bot.command(update, updater, admin_chat_id)
+    chat_id = update.effective_chat.id
+    if chat_id == admin_chat_id:
+        send(updater, chat_id, 'Stopping Bot')
+        stop_bot.command(updater)
+    else:
+        return
+
+### NO NEW COMMANDS BELOW HERE ###
 
 # handles unknown commands submitted to the bot
 def unknown(update, context):
