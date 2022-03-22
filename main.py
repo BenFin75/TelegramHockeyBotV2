@@ -4,7 +4,7 @@ from telegram.ext import *
 import pandas as pd
 from pathlib import Path, PureWindowsPath
 import os
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time, timedelta, tzinfo
 import pytz
 
 # my scripts
@@ -29,14 +29,21 @@ import game_time_notifications
 import stop_bot
 import unknown_message
 
+# global variables for the bot
+admin_chat_id = 110799848
+todays_date = date.today()
+time_zone = pytz.timezone('US/Eastern')
+dst_check = bool(datetime.now(time_zone).dst())
+
 # gets the bot token from remote database so the code can be made public
 bot_token_dataframe = pd.read_csv((os.path.join(os.path.dirname(os.getcwd()), "TelegramBotTokens.csv")))
-bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot'].values)
+bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot testing'].values)
 bot_token = str(bot_token_dataframe.loc[[bot_index], ['Bot Token']].values).strip("'[]")
 bot = Bot(bot_token)
 
 # initilizes the bot updater to handle messages
-updater = Updater(bot_token, use_context=True)
+defaults = Defaults(tzinfo=time_zone)
+updater = Updater(bot_token, use_context=True, defaults=defaults)
 
 jobs = updater.job_queue
 jobs.start
@@ -50,14 +57,6 @@ todays_games_database_win = PureWindowsPath('.\Database\\todaysgames.csv')
 chat_database = Path(chat_database_win)
 teams_database = Path(teams_database_win)
 todays_games_database = Path(todays_games_database_win)
-
-# global variables for the bot
-admin_chat_id = 110799848
-todays_date = date.today()
-time_zone = 'US/Eastern'
-dst_check = bool(datetime.now(pytz.timezone(time_zone)).dst())
-starting = True
-
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
@@ -202,11 +201,10 @@ def unknown(update, context):
     send(updater, chat_id, message)
 
 
-### Automation Functions ###
+### Start Automatic Notifications ###
+
 def start_notifications():
-    runtime = time(8, 00, 00, 0000, tzinfo = pytz.timezone(time_zone))
-    print(runtime)
-    print(datetime.now())
+    runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
 
 start_notifications()
@@ -242,7 +240,7 @@ dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
-# dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
+dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
 dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('stop', stop))
 

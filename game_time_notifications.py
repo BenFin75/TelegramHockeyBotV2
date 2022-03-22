@@ -8,7 +8,8 @@ import time
 from handle_messages import send
 import api_checks
 
-def create_notification(updater, both_teams, chat_database, todays_date):
+def create_notification(context):
+    updater, both_teams, chat_database, todays_date =  context.job.context
     todays_date = '2022-03-15'
     team_ids = list(both_teams.split(','))
     chat_dataframe = pd.read_csv(chat_database)
@@ -44,19 +45,17 @@ def create_notification(updater, both_teams, chat_database, todays_date):
         send(updater, chat_id, message)
     return schedule.CancelJob
 
-def start_notifications(updater, todays_games_database, chat_database, todays_date):
+def start_notifications(updater, todays_games_database, chat_database, todays_date, jobs):
   todays_games_dataframe = pd.read_csv(todays_games_database)
   for game in todays_games_dataframe.iterrows():
       home_team = str(game[1]["HomeIDs"])
       away_team = str(game[1]["AwayIDs"])
       both_teams = home_team + ',' + away_team
       game_time = game[1]["Time"]
-      schedule.every().day.at(game_time).do(create_notification, updater, both_teams, chat_database, todays_date)
-  while True:
-    schedule.run_pending()
-    time.sleep(1)
+      time_object = datetime.strptime(game_time, '%H:%M').time()
+      jobs.run_once(create_notification, time_object, context=(updater, both_teams, chat_database, todays_date))
 
-def create_csv(updater, todays_games, todays_games_database, chat_database, todays_date, dst_check):
+def create_csv(todays_games, todays_games_database, dst_check):
     
     todays_dataframe = pd.DataFrame(columns=('HomeIDs', 'AwayIDs', 'Time'))
     index = 0
@@ -81,18 +80,15 @@ def create_csv(updater, todays_games, todays_games_database, chat_database, toda
     else:
         return
 
-def test(updater, chat_id, admin_chat_id, chat_database, todays_date):
+def test(updater, chat_database, todays_date, jobs, runtime):
     """
     DEBUGING FUCTION  
         runs the game time notifications on command
     """
-    if chat_id == admin_chat_id:
-        send(updater, chat_id, 'Testing Game Time Notifications')
-        todays_games_dataframe = pd.read_csv('./Database/testinggames.csv')
-        for game in todays_games_dataframe.iterrows():
-            home_team = str(game[1]["HomeIDs"])
-            away_team = str(game[1]["AwayIDs"])
-            both_teams = home_team + ',' + away_team
-            create_notification(updater, both_teams, chat_database, todays_date)
-    else:
-        return
+
+    todays_games_dataframe = pd.read_csv('./Database/testinggames.csv')
+    for game in todays_games_dataframe.iterrows():
+        home_team = str(game[1]["HomeIDs"])
+        away_team = str(game[1]["AwayIDs"])
+        both_teams = home_team + ',' + away_team
+        jobs.run_once(create_notification, runtime, context=(updater, both_teams, chat_database, todays_date))
