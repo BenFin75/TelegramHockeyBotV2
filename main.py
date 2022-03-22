@@ -31,7 +31,7 @@ import unknown_message
 
 # gets the bot token from remote database so the code can be made public
 bot_token_dataframe = pd.read_csv((os.path.join(os.path.dirname(os.getcwd()), "TelegramBotTokens.csv")))
-bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot testing'].values)
+bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot'].values)
 bot_token = str(bot_token_dataframe.loc[[bot_index], ['Bot Token']].values).strip("'[]")
 bot = Bot(bot_token)
 
@@ -161,9 +161,9 @@ def test_daily_notifications(update, context):
     runtime = datetime.now(pytz.timezone(time_zone)) + timedelta(seconds=30)
     daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check, jobs, runtime)
 
-def test_gametime_notifications(update, context):
-    chat_id = update.effective_chat.id
-    game_time_notifications.test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date)
+# def test_gametime_notifications(update, context):
+#     chat_id = update.effective_chat.id
+#     game_time_notifications.test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date)
 
 # creates the list of games for the day for testing
 def create_game_list(update, context):
