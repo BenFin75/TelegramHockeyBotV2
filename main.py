@@ -223,7 +223,7 @@ dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
-dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
+# dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
 dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('stop', stop))
 
