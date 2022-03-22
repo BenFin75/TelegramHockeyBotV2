@@ -38,9 +38,9 @@ bot = Bot(bot_token)
 updater = Updater(bot_token, use_context=True)
 
 # set the database paths so the bot works on any OS.
-chat_database_win = PureWindowsPath('.\hockeybot-v2\Database\ChatDatabase.csv')
-teams_database_win = PureWindowsPath('.\hockeybot-v2\Database\TeamNames.csv')
-todays_games_database_win = PureWindowsPath('.\hockeybot-v2\Database\\todaysgames.csv')
+chat_database_win = PureWindowsPath('.\Database\ChatDatabase.csv')
+teams_database_win = PureWindowsPath('.\Database\TeamNames.csv')
+todays_games_database_win = PureWindowsPath('.\Database\\todaysgames.csv')
 
 # OS-independent paths
 chat_database = Path(chat_database_win)
