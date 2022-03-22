@@ -4,11 +4,12 @@ from telegram.ext import *
 import pandas as pd
 from pathlib import Path, PureWindowsPath
 import os
-from datetime import datetime, date
+from datetime import datetime, date, time, timedelta
 import pytz
 
 # my scripts
 from handle_messages import send
+import api_checks
 import start_bot
 import help_bot
 import setup_user
@@ -30,12 +31,15 @@ import unknown_message
 
 # gets the bot token from remote database so the code can be made public
 bot_token_dataframe = pd.read_csv((os.path.join(os.path.dirname(os.getcwd()), "TelegramBotTokens.csv")))
-bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot'].values)
+bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot testing'].values)
 bot_token = str(bot_token_dataframe.loc[[bot_index], ['Bot Token']].values).strip("'[]")
 bot = Bot(bot_token)
 
 # initilizes the bot updater to handle messages
 updater = Updater(bot_token, use_context=True)
+
+jobs = updater.job_queue
+jobs.start
 
 # set the database paths so the bot works on any OS.
 chat_database_win = PureWindowsPath('.\Database\ChatDatabase.csv')
@@ -154,14 +158,19 @@ def f1_standings(update, context):
 # runs the daily notification command for testing
 def test_daily_notifications(update, context):
     chat_id = update.effective_chat.id
-    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check)
+    runtime = datetime.now(pytz.timezone(time_zone)) + timedelta(seconds=30)
+    daily_notifications.test(updater, chat_id, admin_chat_id, chat_database, todays_games_database, dst_check, jobs, runtime)
 
 def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
     game_time_notifications.test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date)
 
 # creates the list of games for the day for testing
-# def create_game_list(update, context):
+def create_game_list(update, context):
+    chat_id = update.effective_chat.id
+    todays_games = api_checks.schedule_call(f'date={todays_date}')
+    game_time_notifications.create_csv(updater, todays_games, todays_games_database, chat_database, todays_date, dst_check)
+    send(updater, chat_id, 'Generated csv')
 
 # stops the bot program
 def stop(update, context):
@@ -173,13 +182,15 @@ def unknown(update, context):
     message = unknown_message.message()
     send(updater, chat_id, message)
 
-### Automation Functions ###
-def start_notifications(starting):
-    if starting == True:
-        starting = False
-        daily_notifications.start_timer(updater, chat_database, todays_games_database, dst_check)
 
-# start_notifications(starting)
+### Automation Functions ###
+def start_notifications():
+    runtime = time(8, 00, 00, 0000, tzinfo = pytz.timezone(time_zone))
+    print(runtime)
+    print(datetime.now())
+    daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
+
+start_notifications()
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
@@ -213,7 +224,7 @@ dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
 dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
-# dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
+dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('stop', stop))
 
 # handles unknown messages

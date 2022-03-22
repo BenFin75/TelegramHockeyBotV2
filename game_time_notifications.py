@@ -42,8 +42,7 @@ def create_notification(updater, both_teams, chat_database, todays_date):
     for i in chat_ids:
         chat_id = int(i)
         send(updater, chat_id, message)
-        
-        
+    return schedule.CancelJob
 
 def start_notifications(updater, todays_games_database, chat_database, todays_date):
   todays_games_dataframe = pd.read_csv(todays_games_database)
@@ -65,26 +64,24 @@ def create_csv(updater, todays_games, todays_games_database, chat_database, toda
         for i in todays_games['dates'][0]['games']:
             home_team = i['teams']['home']['team']['id']
             away_team = i['teams']['away']['team']['id']
+            game_fulltime = i['gameDate']
+            game_time = game_fulltime[12:-2]
+            if dst_check == True:
+                game_time_obj = datetime.strptime(
+                    game_time, '%H:%M:%S') - timedelta(hours=4)
             if dst_check == False:
-                game_fulltime = i['gameDate']
-                game_time = game_fulltime[12:-2]
-                if dst_check == True:
-                    game_time_obj = datetime.strptime(
-                        game_time, '%H:%M:%S') - timedelta(hours=4)
-                if dst_check == False:
-                    game_time_obj = datetime.strptime(
-                        game_time, '%H:%M:%S') - timedelta(hours=5)
-                    game_time_obj - \
-                        timedelta(minutes=game_time_obj.minute % 10)
-                game_start = str(datetime.strftime(game_time_obj, '%H:%M'))
+                game_time_obj = datetime.strptime(
+                    game_time, '%H:%M:%S') - timedelta(hours=5)
+                game_time_obj - \
+                    timedelta(minutes=game_time_obj.minute % 10)
+            game_start = str(datetime.strftime(game_time_obj, '%H:%M'))
             todays_dataframe.loc[index] = [home_team, away_team, game_start]
             index += 1
         todays_dataframe.to_csv(todays_games_database, index=False, header=True)
-        start_notifications(updater, todays_games_database, chat_database, todays_date)
     else:
         return
 
-def test(updater, chat_id, admin_chat_id, todays_games_database, chat_database, todays_date):
+def test(updater, chat_id, admin_chat_id, chat_database, todays_date):
     """
     DEBUGING FUCTION  
         runs the game time notifications on command
