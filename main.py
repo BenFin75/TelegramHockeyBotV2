@@ -178,7 +178,7 @@ def create_game_list(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
         todays_games = api_checks.schedule_call(f'date={todays_date}')
-        game_time_notifications.create_csv(updater, todays_games, todays_games_database, chat_database, todays_date, dst_check)
+        game_time_notifications.create_csv(todays_games, todays_games_database, dst_check)
         send(updater, chat_id, 'Generated csv')
     else:
         return
