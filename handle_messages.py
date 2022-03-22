@@ -38,12 +38,12 @@ def send_image(updater, chat_id, table):
     out = Image.new("RGB", (width, height), ('#182533'))
 
     # get a font
-    fnt = ImageFont.truetype('./hockeybot-v2/JetBrainsMono-Bold.ttf', 15)
+    fnt = ImageFont.truetype('./JetBrainsMono-Bold.ttf', 15)
     # get a drawing context
     d = ImageDraw.Draw(out)
 
     # draw multiline text
     d.multiline_text((15, 4), table_string, font=fnt, fill=('#e4ecf2'))
     
-    out.save('./hockeybot-v2/Database/image.png')
-    updater.bot.send_photo(chat_id, photo=open('./hockeybot-v2/Database/image.png', 'rb'))
+    out.save('./Database/image.png')
+    updater.bot.send_photo(chat_id, photo=open('./Database/image.png', 'rb'))
