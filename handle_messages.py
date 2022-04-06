@@ -1,4 +1,3 @@
-from email import message
 from telegram import *
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
