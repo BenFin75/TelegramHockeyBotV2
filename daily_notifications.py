@@ -4,7 +4,7 @@ import json
 
 from handle_messages import send
 import api_checks
-import game_time_notifications
+# import game_time_notifications
 import game_check
 
 def run(context):
@@ -27,8 +27,8 @@ def run(context):
             send(updater, chat_id, message)
         del chats_to_notify[0]
     # create csv for game time notifications
-    game_time_notifications.create_csv(todays_games, todays_games_database, dst_check)
-    game_time_notifications.start_notifications(updater, todays_games_database, chat_database, todays_date, jobs)
+    # game_time_notifications.create_csv(todays_games, todays_games_database, dst_check)
+    # game_time_notifications.start_notifications(updater, todays_games_database, chat_database, todays_date, jobs)
 
 def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_check):
     """
