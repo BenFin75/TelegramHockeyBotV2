@@ -7,4 +7,9 @@ services:
       - .env
     volumes:
       - ./database/:/TelegramHockeyBotV2/database/:rw
+    command: 
+      - bash 
+      - -c 
+      - git clone git@github.com:user/project.git;
+      - cd ./TelegramHockeyBotV2 && python3 ./main
     restart: unless-stopped
