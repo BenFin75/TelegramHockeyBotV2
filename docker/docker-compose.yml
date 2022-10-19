@@ -13,7 +13,5 @@ services:
       - cd ./TelegramHockeyBotV2 && git init -b main
       - cd ./TelegramHockeyBotV2 && git remote add origin https://github.com/BenFin75/TelegramHockeyBotV2.git
       - cd ./TelegramHockeyBotV2 && git pull
-      - cd ./TelegramHockeyBotV2 && git reset origin/main
-      - cd ./TelegramHockeyBotV2 && git checkout -t origin/main
       - cd ./TelegramHockeyBotV2 && python3 ./main
     restart: unless-stopped
