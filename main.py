@@ -2,7 +2,7 @@
 from telegram import *
 from telegram.ext import *
 import pandas as pd
-# from pathlib import Path, PureWindowsPath
+from pathlib import Path, PureWindowsPath
 import os
 from datetime import datetime, date, time, timedelta, tzinfo
 import pytz
@@ -56,14 +56,14 @@ jobs = updater.job_queue
 jobs.start
 
 # set the database paths so the bot works on any OS.
-# chat_database_win = PureWindowsPath('.\database\chat_database.csv')
-# teams_database_win = PureWindowsPath('.\database\\team_names.csv')
-# todays_games_database_win = PureWindowsPath('.\database\\todays_games.csv')
+chat_database_win = PureWindowsPath('.\database\chat_database.csv')
+teams_database_win = PureWindowsPath('.\database\\team_names.csv')
+todays_games_database_win = PureWindowsPath('.\database\\todays_games.csv')
 
 # OS-independent paths
-chat_database = './database/chat_database.csv'
-teams_database = './database/team_names.csv'
-todays_games_database = './database/todays_games.csv'
+chat_database = Path(chat_database_win)
+teams_database = Path(teams_database_win)
+todays_games_database = Path(todays_games_database_win)
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
