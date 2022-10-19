@@ -1,3 +1,6 @@
-Database/
+docker/database/chat_database.csv
 __pycache__/
 testing.py
+.env
+database/
+!docker/database/
