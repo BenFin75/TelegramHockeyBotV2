@@ -8,4 +8,6 @@ RUN apt install git
 
 RUN git clone https://github.com/BenFin75/TelegramHockeyBotV2.git
 
+COPY ./database .TelegramHockeyBotV2/database
+
 CMD ["python3", "./TelegramHockeyBotV2/main.py"]
