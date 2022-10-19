@@ -10,6 +10,6 @@ services:
     command: 
       - bash 
       - -c 
-      - git clone git@github.com:user/project.git;
+      - git clone https://github.com/BenFin75/TelegramHockeyBotV2.git
       - cd ./TelegramHockeyBotV2 && python3 ./main
     restart: unless-stopped
