@@ -1,6 +1,6 @@
 services:
   hcokey_bot:
-    image: ghcr.io/linuxserver/plex
+    image: hockey_bot:2.1
     container_name: hockey_bot
     network_mode: host
     env_file:
