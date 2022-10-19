@@ -6,6 +6,7 @@ from pathlib import Path, PureWindowsPath
 import os
 from datetime import datetime, date, time, timedelta, tzinfo
 import pytz
+import sys
 
 # my scripts
 from handle_messages import send
@@ -30,16 +31,22 @@ import stop_bot
 import unknown_message
 
 # global variables for the bot
-admin_chat_id = 110799848
 todays_date = date.today()
 time_zone = pytz.timezone('US/Eastern')
 dst_check = bool(datetime.now(time_zone).dst())
 
-# gets the bot token from remote database so the code can be made public
-bot_token_dataframe = pd.read_csv((os.path.join(os.path.dirname(os.getcwd()), "TelegramBotTokens.csv")))
-bot_index = int(bot_token_dataframe.index[bot_token_dataframe['Bot Name'] == 'Hockey Bot'].values)
-bot_token = str(bot_token_dataframe.loc[[bot_index], ['Bot Token']].values).strip("'[]")
-bot = Bot(bot_token)
+# gets the bot token and admin ID from environment variable
+admin_chat_id = os.getenv("BOT_ADMIN_ID")
+if admin_chat_id:
+    admin_chat_id=int(admin_chat_id)
+else:
+    sys.exit("no admin chat id found. Please set $BOT_ADMIN_ID")
+    
+bot_token = os.getenv("HOCKEY_BOT_KEY")
+if bot_token:
+    bot = Bot(bot_token)
+else:
+    sys.exit("no bot key found. Please set $HOCKEY_BOT_KEY")
 
 # initilizes the bot updater to handle messages
 defaults = Defaults(tzinfo=time_zone)
@@ -49,9 +56,9 @@ jobs = updater.job_queue
 jobs.start
 
 # set the database paths so the bot works on any OS.
-chat_database_win = PureWindowsPath('.\Database\ChatDatabase.csv')
-teams_database_win = PureWindowsPath('.\Database\TeamNames.csv')
-todays_games_database_win = PureWindowsPath('.\Database\\todaysgames.csv')
+chat_database_win = PureWindowsPath('.\database\chat_database.csv')
+teams_database_win = PureWindowsPath('.\database\\team_names.csv')
+todays_games_database_win = PureWindowsPath('.\database\\todays_games.csv')
 
 # OS-independent paths
 chat_database = Path(chat_database_win)
