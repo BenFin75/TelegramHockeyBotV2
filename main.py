@@ -61,9 +61,9 @@ jobs.start
 # todays_games_database_win = PureWindowsPath('.\database\\todays_games.csv')
 
 # OS-independent paths
-chat_database = '.\database\chat_database.csv'
-teams_database = '.\database\\team_names.csv'
-todays_games_database = '.\database\\todays_games.csv'
+chat_database = './database/chat_database.csv'
+teams_database = './database/team_names.csv'
+todays_games_database = './database/todays_games.csv'
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
