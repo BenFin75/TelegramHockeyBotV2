@@ -1,0 +1,10 @@
+services:
+  hcokey_bot:
+    image: ghcr.io/linuxserver/plex
+    container_name: hockey_bot
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - /database:/database
+    restart: unless-stopped
