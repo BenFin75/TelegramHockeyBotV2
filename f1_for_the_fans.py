@@ -69,13 +69,15 @@ def last():
       team = team.replace(' F1 Team', '')
     grid = driver['Grid']
     laps = driver['Laps']
-    fastest = driver['FastestLap']['Time']
-    fastest_rank = driver['FastestLap']['@rank']
-    if fastest_rank == '1':
-      fastest = '* ' + fastest
     points = driver['@points']
-  
-    table.add_row([position, name, team, grid, laps, fastest, points])
+    if 'FastestLap' in driver.keys():
+      fastest = driver['FastestLap']['Time']
+      fastest_rank = driver['FastestLap']['@rank']
+      if fastest_rank == '1':
+        fastest = '* ' + fastest
+      table.add_row([position, name, team, grid, laps, fastest, points])
+    else:
+      table.add_row([position, name, team, grid, laps, fastest, points])
   
   return table
 
