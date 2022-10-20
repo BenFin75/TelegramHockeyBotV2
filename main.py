@@ -191,12 +191,12 @@ def create_game_list(update, context):
     else:
         return
 
-# creates the list of games for the day for testing
+# returns a list of data about the bot's state
 def get_info(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
-        message = 'date: ' + todays_date + '\n' + 'dst: ' + dst_check
-        send(updater, chat_id, 'message csv')
+        message = 'date: ' + str(todays_date) + '\n' + 'dst: ' + str(dst_check)
+        send(updater, chat_id, message)
     else:
         return
 
