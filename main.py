@@ -31,9 +31,9 @@ import stop_bot
 import unknown_message
 
 # global variables for the bot
-todays_date = date.today()
 time_zone = pytz.timezone('US/Eastern')
-dst_check = bool(datetime.now(time_zone).dst())
+todays_date = datetime.now(time_zone).date()
+dst_check = bool(datetime.now(time_zone))
 
 # gets the bot token and admin ID from environment variable
 admin_chat_id = os.getenv("BOT_ADMIN_ID")
