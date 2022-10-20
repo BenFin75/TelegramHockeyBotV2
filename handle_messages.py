@@ -44,5 +44,5 @@ def send_image(updater, chat_id, table):
     # draw multiline text
     d.multiline_text((15, 4), table_string, font=fnt, fill=('#e4ecf2'))
     
-    out.save('./Database/image.png')
-    updater.bot.send_photo(chat_id, photo=open('./Database/image.png', 'rb'))
+    out.save('./database/image.png')
+    updater.bot.send_photo(chat_id, photo=open('./database/image.png', 'rb'))
