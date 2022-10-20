@@ -6,5 +6,5 @@ services:
     env_file:
       - .env
     volumes:
-      - /database:/TelegramHockeyBotV2/database
+      - /database:/TelegramHockeyBotV2/database:rw
     restart: unless-stopped
