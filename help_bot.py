@@ -16,6 +16,9 @@ def message():
         "/stats <team name>" + "\n" + "/stats <team name> <player>" + "\n" + "get the regular season stats for a given team or player" + "\n" + " e.g /stats Penguins, /stats Penguins 87, or /stats Penguins Crosby" + "\n" + "\n" +
         "/standings <division name>" + "\n" + "get the standings for a given division e.g /standings Pacific" + "\n" + "If left blank /standings will retrun all division stnadings" "\n" + "\n" +
         "/cupcheck" + "\n" + "Important stats" + "\n" + "\n" +
+        "/f1next" + "\n" + "get date and location of next F1 race" + "\n" + "\n" +
+        "/f1last" + "\n" + "get the results of the last F1 race" + "\n" + "\n" +
+        "/f1standings" + "\n" + "get the season standings for F1" + "\n" + "\n" +
         "/removeMe" + "\n" + "Delete your teams and notification data." + "\n" + "\n" +
         "/help" + "\n" + "opens this list of commands" + "\n" + "\n" +
         "Thank you for using my bot!" + "\n" + "\n" +
