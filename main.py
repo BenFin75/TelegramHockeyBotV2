@@ -189,6 +189,15 @@ def create_game_list(update, context):
         send(updater, chat_id, 'Generated csv')
     else:
         return
+    
+# returns a list of data about the bot's state
+def get_info(update, context):
+    chat_id = update.effective_chat.id
+    if chat_id == admin_chat_id:
+        message = 'date: ' + str(todays_date) + '\n' + 'dst: ' + str(dst_check)
+        send(updater, chat_id, message)
+    else:
+        return
 
 # stops the bot program
 def stop(update, context):
@@ -249,6 +258,7 @@ dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
 dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
 dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
+dispatcher.add_handler(CommandHandler('getinfo', get_info))
 dispatcher.add_handler(CommandHandler('stop', stop))
 
 # handles unknown messages
