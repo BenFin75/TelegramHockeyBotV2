@@ -13,6 +13,10 @@ dst_check = bool(datetime.now(time_zone))
 
 
 def create_notification(context):
+    """
+    Create the notification for each game 
+    ran at game time
+    """
     updater, both_teams, chats_to_notify, todays_date =  context.job.context
     game_notif = api_checks.schedule_call(f'teamId={both_teams}&date={todays_date}')
     # the encoding is so that Montréal has its é, can't forget that
@@ -39,18 +43,10 @@ def create_notification(context):
         send(updater, chat_id, message)
     # return schedule.CancelJob
 
-# def start_notifications(updater, todays_games_database, chat_database, todays_date, jobs):
-#   todays_games_dataframe = pd.read_csv(todays_games_database)
-#   for game in todays_games_dataframe.iterrows():
-#       home_team = str(game[1]["HomeIDs"])
-#       away_team = str(game[1]["AwayIDs"])
-#       both_teams = home_team + ',' + away_team
-#       game_time = game[1]["Time"]
-#       time_object = datetime.strptime(game_time, '%H:%M').time()
-#       jobs.run_once(create_notification, time_object, context=(updater, both_teams, chat_database, todays_date))
-
-
 def start_today(context):
+    """
+     Queue up the list of jobs for messages to send each day
+    """
     updater, todays_date, jobs, chat_database = context.job.context
     current_time = datetime.now(time_zone).replace(tzinfo=None)
     todays_games = api_checks.schedule_call(f'date={todays_date}')
@@ -109,38 +105,12 @@ def start_today(context):
         chats_to_notify = game['chats']
         jobs.run_once(create_notification, runtime, context=(updater, both_teams, chats_to_notify, todays_date))
 
-# def create_csv(todays_games, todays_games_database, dst_check):
-    
-#     todays_dataframe = pd.DataFrame(columns=('HomeIDs', 'AwayIDs', 'Time'))
-#     index = 0
-#     if todays_games['totalItems'] >= 1:
-#         for i in todays_games['dates'][0]['games']:
-#             home_team = i['teams']['home']['team']['id']
-#             away_team = i['teams']['away']['team']['id']
-#             game_fulltime = i['gameDate']
-#             game_time = game_fulltime[12:-2]
-#             if dst_check == True:
-#                 game_time_obj = datetime.strptime(
-#                     game_time, '%H:%M:%S') - timedelta(hours=4)
-#             if dst_check == False:
-#                 game_time_obj = datetime.strptime(
-#                     game_time, '%H:%M:%S') - timedelta(hours=5)
-#                 game_time_obj = timedelta(minutes=game_time_obj.minute % 10)
-#             game_start = str(datetime.strftime(game_time_obj, '%H:%M'))
-#             todays_dataframe.loc[index] = [home_team, away_team, game_start]
-#             index += 1
-#         todays_dataframe.to_csv(todays_games_database, index=False, header=True)
-#     else:
-#         return
-
 def test(updater, todays_date, jobs):
     """
     DEBUGING FUCTION  
         runs the game time notifications on command
     """
     
-    # todays_games_dataframe = pd.read_csv('./Database/testinggames.csv')
-    # for game in todays_games_dataframe.iterrows():
     games_to_notify = [{'home':4, 'away':13, "time":10,'chats':[110799848]}, {'home':9, 'away':30, "time":10,'chats':[110799848]}]
     for game in games_to_notify:
         both_teams = str(game['home']) + ',' + str(game['away'])
