@@ -175,8 +175,7 @@ def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
         send(updater, chat_id, 'Testing Game Time Notifications')
-        runtime = datetime.now(time_zone) + timedelta(seconds=30)
-        game_time_notifications.test(updater, chat_database, todays_date, jobs, runtime)
+        game_time_notifications.test(updater, todays_date, jobs)
     else:
         return
 
@@ -190,6 +189,15 @@ def create_game_list(update, context):
     else:
         return
     
+# returns a list of data about the bot's state
+def get_info(update, context):
+    chat_id = update.effective_chat.id
+    if chat_id == admin_chat_id:
+        message = 'date: ' + str(todays_date) + '\n' + 'dst: ' + str(dst_check)
+        send(updater, chat_id, message)
+    else:
+        return
+
 # returns a list of data about the bot's state
 def get_info(update, context):
     chat_id = update.effective_chat.id
@@ -223,7 +231,13 @@ def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
 
+def start_game_time_notifications():
+    context = (updater, todays_date, jobs, chat_database)
+    jobs.run_daily(game_time_notifications.start_today, days=(0, 1, 2, 3, 4, 5, 6), time=time(hour=8, minute=00, second=00), context=context)
+
 start_notifications()
+
+start_game_time_notifications()
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
