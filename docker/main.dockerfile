@@ -4,13 +4,7 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
-<<<<<<< HEAD
 RUN git clone https://github.com/BenFin75/TelegramHockeyBotV2.git
-=======
-# RUN apt install git
-
-# RUN git clone https://github.com/BenFin75/TelegramHockeyBotV2.git
->>>>>>> testing
 
 WORKDIR /TelegramHockeyBotV2
 

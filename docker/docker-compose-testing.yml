@@ -1,0 +1,10 @@
+services:
+  hcokey_bot:
+    image: hockey_bot:testing
+    container_name: hockey_bot_testing
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - ./database/:/TelegramHockeyBotV2/database/:rw
+    restart: unless-stopped
