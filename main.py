@@ -221,14 +221,9 @@ def unknown(update, context):
 def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
-
-def start_game_time_notifications():
-    context = (updater, todays_date, jobs, chat_database)
-    jobs.run_daily(game_time_notifications.start_today, days=(0, 1, 2, 3, 4, 5, 6), time=time(hour=8, minute=00, second=00), context=context)
-
+    game_time_notifications.timer(updater, todays_date, jobs, chat_database, runtime)
+    
 start_notifications()
-
-start_game_time_notifications()
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
