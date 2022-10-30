@@ -126,7 +126,8 @@ def setup(update, context, updater, chat_database):
         if update.callback_query.data not in other_buttons:
             update.callback_query.answer()
             button_value = update.callback_query.data
-            team_ids.append(button_value)
+            if button_value not in team_ids:
+                team_ids.append(button_value)
     
     def notifications(update, context: CallbackContext):
         """
