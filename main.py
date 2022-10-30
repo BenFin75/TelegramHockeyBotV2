@@ -42,7 +42,7 @@ if admin_chat_id:
 else:
     sys.exit("no admin chat id found. Please set $BOT_ADMIN_ID")
     
-bot_token = os.getenv("HOCKEY_BOT_TESTING_KEY")
+bot_token = os.getenv("HOCKEY_BOT_KEY")
 if bot_token:
     bot = Bot(bot_token)
 else:
