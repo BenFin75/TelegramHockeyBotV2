@@ -23,7 +23,7 @@ def update_teams (chat_database, chatname, team_ids, userid):
     if exists is False:
         newchat_dataframe = pd.DataFrame({"ChatName": [chatname], "ChatID": [
                                  userid], "TeamIDs": [string_of_team_ids]})
-        updated_dataframe = chats_dataframe.append(newchat_dataframe, ignore_index=True)
+        updated_dataframe = chats_dataframe.concat(newchat_dataframe, ignore_index=True)
         updated_dataframe.to_csv(chat_database, index=False, header=True)
 
     
