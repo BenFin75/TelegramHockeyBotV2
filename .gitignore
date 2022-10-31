@@ -4,3 +4,4 @@ testing.py
 .env
 database/
 !docker/database/
+./timetest.py
