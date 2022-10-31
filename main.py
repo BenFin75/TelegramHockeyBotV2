@@ -220,7 +220,8 @@ def unknown(update, context):
 ### Start Automatic Notifications ###
 
 def start_notifications():
-    print(current_time)
+    message = current_time
+    send(updater, admin_chat_id, message)
     runtime = time(17, 55, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
     game_time_notifications.timer(updater, todays_date, jobs, chat_database, runtime)
