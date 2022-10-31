@@ -33,6 +33,7 @@ import unknown_message
 # global variables for the bot
 time_zone = pytz.timezone('US/Eastern')
 todays_date = datetime.now(time_zone).date()
+current_time = datetime.now(time_zone).time()
 dst_check = bool(datetime.now(time_zone))
 
 # gets the bot token and admin ID from environment variable
@@ -219,7 +220,8 @@ def unknown(update, context):
 ### Start Automatic Notifications ###
 
 def start_notifications():
-    runtime = time(17, 50, 00, 0000, tzinfo = time_zone)
+    print(current_time)
+    runtime = time(17, 55, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
     game_time_notifications.timer(updater, todays_date, jobs, chat_database, runtime)
     
