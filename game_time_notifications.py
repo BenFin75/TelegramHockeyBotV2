@@ -65,7 +65,7 @@ def start_today(context):
             if dst_check == False:
                 game_time_obj = datetime.strptime(
                     game_fulltime, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=5, minutes=10)
-            this_game = {'home': home_team, 'away':away_team, 'time':round((game_time_obj - current_time).total_seconds())}
+            this_game = {'home': home_team, 'away':away_team, 'time':round((game_time_obj - current_time).total_seconds()), 'chats': []}
             games.append(this_game)
 
     #check games against chat db
