@@ -175,7 +175,7 @@ def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
         send(updater, chat_id, 'Testing Game Time Notifications')
-        game_time_notifications.test(updater, todays_date, jobs)
+        game_time_notifications.test(updater, todays_date, jobs, chat_database)
     else:
         return
 
@@ -217,10 +217,6 @@ def unknown(update, context):
 
 
 ### Start Automatic Notifications ###
-
-def testing_notifs():
-    game_time_notifications.timer(updater, todays_date, jobs, chat_database)
-
 
 # def start_notifications():
 #     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
