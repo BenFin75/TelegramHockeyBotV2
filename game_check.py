@@ -38,7 +38,7 @@ def check(number_of_teams, team_data, dst_check):
         if dst_check == False:
             game_time_obj = datetime.strptime(
                 game_time, '%H:%M:%S') - timedelta(hours=5)
-        game_time_est = datetime.strftime(game_time_obj, '%#I:%M%p')
+        game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')
         playoff_check = json.dumps(
             team_data['dates'][0]['games'][0]['gameType']).strip('\"')
         

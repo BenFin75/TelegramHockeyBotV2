@@ -22,7 +22,7 @@ def next(todays_date, dst_check):
       if dst_check == False:
           start_time_obj = datetime.strptime(
               start_time, '%H:%M:%S') - timedelta(hours=5)
-      start_time_est = datetime.strftime(start_time_obj, '%#I:%M%p')
+      start_time_est = datetime.strftime(start_time_obj, '%-I:%M%p')
       
       race_day_obj = datetime.strptime(race_date, '%Y-%m-%d')
       race_day_str = datetime.strftime(race_day_obj, '%d')

@@ -93,7 +93,7 @@ def build_message(next_game, dst_check):
     if dst_check == False:
         game_time_obj = datetime.strptime(
             game_time, '%H:%M:%S') - timedelta(hours=5)
-    game_time_est = datetime.strftime(game_time_obj, '%#I:%M%p')     
+    game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')     
 
     if 4 <= game_day_int <= 20 or 24 <= game_day_int <= 30:
         game_day_txt += "th"
