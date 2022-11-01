@@ -119,8 +119,7 @@ def test(updater, todays_date, jobs, chat_database):
     DEBUGING FUCTION  
         runs the game time notifications on command
     """
-    context=(updater, todays_date, jobs, chat_database)
-    start_today(context)
+    jobs.run_once(start_today, 5, context=(updater, todays_date, jobs, chat_database))
     
     # games_to_notify = [{'home':4, 'away':13, "time":10,'chats':[110799848]}, {'home':9, 'away':30, "time":10,'chats':[110799848]}]
     # for game in games_to_notify:
