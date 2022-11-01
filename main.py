@@ -42,7 +42,7 @@ if admin_chat_id:
 else:
     sys.exit("no admin chat id found. Please set $BOT_ADMIN_ID")
     
-bot_token = os.getenv("HOCKEY_BOT_KEY")
+bot_token = os.getenv("HOCKEY_BOT_TESTING_KEY")
 if bot_token:
     bot = Bot(bot_token)
 else:
@@ -175,7 +175,7 @@ def test_gametime_notifications(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
         send(updater, chat_id, 'Testing Game Time Notifications')
-        game_time_notifications.test(updater, todays_date, jobs)
+        game_time_notifications.test(updater, todays_date, jobs, chat_database)
     else:
         return
 
@@ -230,9 +230,9 @@ def unknown(update, context):
 def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
-
+    game_time_notifications.timer(updater, todays_date, jobs, chat_database, runtime)
+    
 start_notifications()
-
 
 # dispatcher for the bot to look for each command
 dispatcher = updater.dispatcher
