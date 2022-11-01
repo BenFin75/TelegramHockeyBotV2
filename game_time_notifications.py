@@ -18,7 +18,6 @@ def create_notification(context):
     ran at game time
     """
     updater, both_teams, chats_to_notify, todays_date =  context.job.context
-    print(both_teams) # debug to help get this working
     game_notif = api_checks.schedule_call(f'teamId={both_teams}&date={todays_date}')
     # the encoding is so that Montréal has its é, can't forget that
     away_team = json.dumps(game_notif['dates'][0]['games'][0]['teams']['away']['team']['name'], ensure_ascii=False).encode('utf8')
@@ -100,7 +99,6 @@ def start_today(context):
 
                     # add chat id to game obj in chats_to_notify
                     games_to_notify.append(game)
-    print(games_to_notify) #debug to help get this working
     for game in games_to_notify:
         both_teams = str(game['home']) + ',' + str(game['away'])
         runtime = game['time']
