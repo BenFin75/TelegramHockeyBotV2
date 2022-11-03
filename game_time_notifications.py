@@ -17,7 +17,7 @@ def create_notification(context):
     Create the notification for each game 
     ran at game time
     """
-    updater, both_teams, chats_to_notify, todays_date =  context.job.context
+    updater, both_teams, chats_to_notify =  context.job.context
     game_notif = api_checks.schedule_call(f'teamId={both_teams}&date={todays_date}')
     # the encoding is so that Montréal has its é, can't forget that
     away_team = json.dumps(game_notif['dates'][0]['games'][0]['teams']['away']['team']['name'], ensure_ascii=False).encode('utf8')
@@ -47,7 +47,7 @@ def start_today(context):
     """
      Queue up the list of jobs for messages to send each day
     """
-    updater, todays_date, jobs, chat_database = context.job.context
+    updater, jobs, chat_database = context.job.context
     current_time = datetime.now(time_zone).replace(tzinfo=None)
     todays_games = api_checks.schedule_call(f'date={todays_date}')
 
@@ -103,21 +103,21 @@ def start_today(context):
         both_teams = str(game['home']) + ',' + str(game['away'])
         runtime = game['time']
         chats_to_notify = game['chats']
-        jobs.run_once(create_notification, runtime, context=(updater, both_teams, chats_to_notify, todays_date))
+        jobs.run_once(create_notification, runtime, context=(updater, both_teams, chats_to_notify))
 
-def timer(updater, todays_date, jobs, chat_database, runtime):
+def timer(updater, jobs, chat_database, runtime):
     """
         Send notification at 8am every day
     """
     
-    jobs.run_daily(start_today, runtime, context=(updater, todays_date, jobs, chat_database))
+    jobs.run_daily(start_today, runtime, context=(updater, jobs, chat_database))
 
-def test(updater, todays_date, jobs, chat_database):
+def test(updater, jobs, chat_database):
     """
     DEBUGING FUCTION  
         runs the game time notifications on command
     """
-    jobs.run_once(start_today, 5, context=(updater, todays_date, jobs, chat_database))
+    jobs.run_once(start_today, 5, context=(updater, jobs, chat_database))
     
     # games_to_notify = [{'home':4, 'away':13, "time":10,'chats':[110799848]}, {'home':9, 'away':30, "time":10,'chats':[110799848]}]
     # for game in games_to_notify:

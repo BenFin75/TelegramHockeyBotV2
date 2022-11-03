@@ -230,7 +230,7 @@ def unknown(update, context):
 def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
     daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
-    game_time_notifications.timer(updater, todays_date, jobs, chat_database, runtime)
+    game_time_notifications.timer(updater, jobs, chat_database, runtime)
     
 start_notifications()
 
