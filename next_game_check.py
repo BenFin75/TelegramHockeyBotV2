@@ -32,7 +32,7 @@ def message(user_request, teams_database, time_zone, utc_tz, todays_date):
             elif 'nextGameSchedule' not in elimcheck:
                 return_message = eliminated(team_dataframe, team_id, last_game, playoff_check)
             else:
-                return_message = build_message(next_game, time_zone)
+                return_message = build_message(next_game,  time_zone, utc_tz)
 
     return return_message
 
