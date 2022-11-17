@@ -18,7 +18,7 @@ def next(todays_date, time_zone, utc_tz):
             start_time = start_time.replace('"', '')
             start_time = start_time.replace('T', ' ')
             start_time = start_time.replace('Z', '')
-            start_time_obj = datetime.fromisoformat(start_time).replace(tzinfo=utc_tz)
+            start_time_obj = datetime.strptime(start_time, '%H:%M:%S')
             start_time_est = start_time_obj.astimezone(time_zone).strftime('%#I:%M%p')
             
             race_day_obj = datetime.strptime(race_date, '%Y-%m-%d')
