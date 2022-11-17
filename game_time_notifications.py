@@ -59,13 +59,9 @@ def start_today(context):
             home_team = i['teams']['home']['team']['id']
             away_team = i['teams']['away']['team']['id']
             game_fulltime = i['gameDate']
-            if dst_check == True:
-                game_time_obj = datetime.strptime(
-                    game_fulltime, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=4, minutes=10)
-            if dst_check == False:
-                game_time_obj = datetime.strptime(
-                    game_fulltime, "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=5, minutes=10)
-            this_game = {'home': home_team, 'away':away_team, 'time':round((game_time_obj - current_time).total_seconds()), 'chats': []}
+            game_time_obj = datetime.strptime(
+                game_fulltime, "%Y-%m-%dT%H:%M:%SZ")
+            this_game = {'home': home_team, 'away':away_team, 'time':round((game_time_obj - datetime.utcnow() - timedelta(minutes=10)).total_seconds()), 'chats': []}
             games.append(this_game)
 
     #check games against chat db
