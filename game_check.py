@@ -1,7 +1,7 @@
 import json
 from datetime import datetime, timedelta
 
-def check(number_of_teams, team_data, dst_check):
+def check(number_of_teams, team_data, time_zone, utc_tz):
     """
     The core function for returning the game description
     for the teams being followed by the user
@@ -31,14 +31,10 @@ def check(number_of_teams, team_data, dst_check):
             team_data['dates'][0]['games'][number_of_teams]['teams']['home']['leagueRecord']['losses'])
         game_fulltime = json.dumps(
             team_data['dates'][0]['games'][number_of_teams]['gameDate'])
-        game_time = game_fulltime[12:-2]
-        if dst_check == True:
-            game_time_obj = datetime.strptime(
-                game_time, '%H:%M:%S') - timedelta(hours=4)
-        if dst_check == False:
-            game_time_obj = datetime.strptime(
-                game_time, '%H:%M:%S') - timedelta(hours=5)
-        game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')
+        game_fulltime = game_fulltime.replace('T', ' ')
+        game_fulltime = game_fulltime.replace('Z', '')
+        game_time_obj = datetime.fromisoformat(game_fulltime).replace(tzinfo=utc_tz)
+        game_time_est = game_time_obj.astimezone(time_zone).strftime('%#I:%M%p')
         playoff_check = json.dumps(
             team_data['dates'][0]['games'][0]['gameType']).strip('\"')
         

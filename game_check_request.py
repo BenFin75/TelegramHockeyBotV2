@@ -3,7 +3,7 @@ import pandas as pd
 import api_checks
 import game_check
 
-def message(chat_database, chat_id, todays_date, dst_check):
+def message(chat_database, chat_id, todays_date, time_zone, utc_tz):
     """
         Runs the gamecheck funtion for the teams being followed by the user
     """
@@ -22,7 +22,7 @@ def message(chat_database, chat_id, todays_date, dst_check):
         if number_of_teams > 0:
             string_of_playing_teams = ','.join(list_of_playing_teams)
             team_data = api_checks.schedule_call(f'teamId={string_of_playing_teams}&date={todays_date}')
-            message = game_check.check(number_of_teams, team_data, dst_check)
+            message = game_check.check(number_of_teams, team_data, time_zone, utc_tz)
         else:
             message = 'There is not a game today'
     

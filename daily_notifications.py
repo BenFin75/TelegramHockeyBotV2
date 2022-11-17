@@ -4,7 +4,6 @@ import json
 
 from handle_messages import send
 import api_checks
-# import game_time_notifications
 import game_check
 
 def run(context):
@@ -12,7 +11,7 @@ def run(context):
         Handles the inital data for the daily notifications
         and restarts the timer for the next day at 8am
     """
-    updater, chat_database, todays_games_database, dst_check, jobs = context.job.context
+    updater, chat_database, time_zone, utc_tz, jobs = context.job.context
     todays_date = date.today()
     chat_dataframe = pd.read_csv(chat_database)
     chats_to_notify = list(
@@ -22,15 +21,12 @@ def run(context):
 
     while len(chats_to_notify) > 0:
         chat_id = chats_to_notify[0]
-        message = get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_check)
+        message = get_notification(chat_id, todays_games, chat_dataframe, todays_date, time_zone, utc_tz)
         if message:
             send(updater, chat_id, message)
         del chats_to_notify[0]
-    # create csv for game time notifications
-    # game_time_notifications.create_csv(todays_games, todays_games_database, dst_check)
-    # game_time_notifications.start_notifications(updater, todays_games_database, chat_database, todays_date, jobs)
 
-def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_check):
+def get_notification(chat_id, todays_games, chat_dataframe, todays_date, time_zone, utc_tz):
     """
         Handles sending the daily notifications
     """
@@ -60,27 +56,27 @@ def get_notification(chat_id, todays_games, chat_dataframe, todays_date, dst_che
 
         # send game day notifications
         if number_of_teams > 0:
-            return game_check.check(number_of_teams, team_data, dst_check)
+            return game_check.check(number_of_teams, team_data, time_zone, utc_tz)
         else:
             return False
     else:
         return False
     
-def timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime):
+def timer(updater, chat_database, time_zone, utc_tz, jobs, runtime):
     """
         Send notification at 8am every day
     """
     
-    jobs.run_daily(run, runtime, context=(updater, chat_database, todays_games_database, dst_check, jobs))
+    jobs.run_daily(run, runtime, context=(updater, chat_database, time_zone, utc_tz, jobs))
     
     
-def start_timer(updater, chat_database, todays_games_database, dst_check):
-    timer(updater, chat_database, todays_games_database, dst_check)
+def start_timer(updater, chat_database, time_zone, utc_tz):
+    timer(updater, chat_database, time_zone, utc_tz)
     
     
-def test(updater, chat_database, todays_games_database, dst_check, jobs, runtime):
+def test(updater, chat_database, time_zone, utc_tz, jobs, runtime):
     """
     DEBUGING FUCTION  
         runs the daily notifications on command
     """
-    jobs.run_once(run, runtime, context=(updater, chat_database, todays_games_database, dst_check, jobs))
+    jobs.run_once(run, runtime, context=(updater, chat_database, time_zone, utc_tz, jobs))

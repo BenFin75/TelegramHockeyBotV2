@@ -32,6 +32,7 @@ import unknown_message
 
 # global variables for the bot
 time_zone = pytz.timezone('US/Eastern')
+utc_tz = pytz.timezone('US/Eastern')
 todays_date = datetime.now(time_zone).date()
 dst_check = bool(datetime.now(time_zone))
 
@@ -92,13 +93,13 @@ def user_remove(update, context):
 
 def check_game(update, context):
     chat_id = update.effective_chat.id
-    message = game_check_request.message(chat_database, chat_id, todays_date, dst_check)
+    message = game_check_request.message(chat_database, chat_id, todays_date, time_zone, utc_tz)
     send(updater, chat_id, message)
 
 def check_next_game(update, context):
     chat_id = update.effective_chat.id
     user_request = update.message.text[10:].lower()
-    message = next_game_check.message(user_request, teams_database, dst_check, todays_date)
+    message = next_game_check.message(user_request, teams_database, time_zone, utc_tz, todays_date)
     send(updater, chat_id, message)
 
 def check_last_game(update, context):
@@ -144,7 +145,7 @@ def check_cupcheck(update, context):
 # returns the next F1 race time and location
 def f1_next(update, context):
     chat_id = update.effective_chat.id
-    message = f1_for_the_fans.next(todays_date, dst_check)
+    message = f1_for_the_fans.next(todays_date, time_zone, utc_tz)
     send(updater, chat_id, message)
 
 # returns the results from the last F1 race
@@ -167,7 +168,7 @@ def test_daily_notifications(update, context):
     if chat_id == admin_chat_id:
         send(updater, chat_id, 'Testing Daily Time Notifications')
         runtime = datetime.now(time_zone) + timedelta(seconds=30)
-        daily_notifications.test(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
+        daily_notifications.test(updater, chat_database, todays_games_database, time_zone, utc_tz, jobs, runtime)
     else:
         return
 
@@ -178,31 +179,12 @@ def test_gametime_notifications(update, context):
         game_time_notifications.test(updater, todays_date, jobs, chat_database)
     else:
         return
-
-# creates the list of games for the day for testing
-def create_game_list(update, context):
-    chat_id = update.effective_chat.id
-    if chat_id == admin_chat_id:
-        todays_games = api_checks.schedule_call(f'date={todays_date}')
-        game_time_notifications.create_csv(todays_games, todays_games_database, dst_check)
-        send(updater, chat_id, 'Generated csv')
-    else:
-        return
     
 # returns a list of data about the bot's state
 def get_info(update, context):
     chat_id = update.effective_chat.id
     if chat_id == admin_chat_id:
-        message = 'date: ' + str(todays_date) + '\n' + 'dst: ' + str(dst_check)
-        send(updater, chat_id, message)
-    else:
-        return
-
-# returns a list of data about the bot's state
-def get_info(update, context):
-    chat_id = update.effective_chat.id
-    if chat_id == admin_chat_id:
-        message = 'date: ' + str(todays_date) + '\n' + 'dst: ' + str(dst_check)
+        message = 'date: ' + str(todays_date)
         send(updater, chat_id, message)
     else:
         return
@@ -229,7 +211,7 @@ def unknown(update, context):
 
 def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
-    daily_notifications.timer(updater, chat_database, todays_games_database, dst_check, jobs, runtime)
+    daily_notifications.timer(updater, chat_database, todays_games_database, time_zone, utc_tz, jobs, runtime)
     game_time_notifications.timer(updater, jobs, chat_database, runtime)
     
 start_notifications()
@@ -266,7 +248,6 @@ dispatcher.add_handler(CommandHandler('f1standings', f1_standings))
 # admin/debugging commands
 dispatcher.add_handler(CommandHandler('testdaily', test_daily_notifications))
 dispatcher.add_handler(CommandHandler('testgametime', test_gametime_notifications))
-dispatcher.add_handler(CommandHandler('creategamelist', create_game_list))
 dispatcher.add_handler(CommandHandler('getinfo', get_info))
 dispatcher.add_handler(CommandHandler('stop', stop))
 

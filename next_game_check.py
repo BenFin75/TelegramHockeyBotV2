@@ -10,7 +10,7 @@ import api_checks
 
 
 
-def message(user_request, teams_database, dst_check, todays_date):
+def message(user_request, teams_database, time_zone, utc_tz, todays_date):
     if len(user_request) == 0:
         return_message = "Please indicate the team you want the next game for." + '\n' + "e.g. /nextgame Pens"
 
@@ -32,7 +32,7 @@ def message(user_request, teams_database, dst_check, todays_date):
             elif 'nextGameSchedule' not in elimcheck:
                 return_message = eliminated(team_dataframe, team_id, last_game, playoff_check)
             else:
-                return_message = build_message(next_game, dst_check)
+                return_message = build_message(next_game, time_zone)
 
     return return_message
 
@@ -58,7 +58,7 @@ def eliminated(team_dataframe, team_id, last_game, playoff_check):
         message = ("Ha, The " + teamid_name_form + " have been eliminated from Stanley Cup Contention. Sucks to suck")
     return message
 
-def build_message(next_game, dst_check):
+def build_message(next_game, time_zone, utc_tz):
     # the encoding is so that Montréal has its é, can't forget that
     away_team = json.dumps(next_game['teams'][0]['nextGameSchedule']['dates'][0]['games']
                            [0]['teams']['away']['team']['name'], ensure_ascii=False).encode('utf8')
@@ -86,14 +86,10 @@ def build_message(next_game, dst_check):
     game_day_int = int(game_day_str)
     game_day_txt = str(game_day_int)
     game_day_of_week = datetime.strftime(game_day_obj, '%A')
-    game_time = game_fulltime[12:-2]
-    if dst_check == True:
-        game_time_obj = datetime.strptime(
-            game_time, '%H:%M:%S') - timedelta(hours=4)
-    if dst_check == False:
-        game_time_obj = datetime.strptime(
-            game_time, '%H:%M:%S') - timedelta(hours=5)
-    game_time_est = datetime.strftime(game_time_obj, '%-I:%M%p')     
+    game_fulltime = game_fulltime.replace('T', ' ')
+    game_fulltime = game_fulltime.replace('Z', '')
+    game_time_obj = datetime.fromisoformat(game_fulltime).replace(tzinfo=utc_tz)
+    game_time_est = game_time_obj.astimezone(time_zone).strftime('%#I:%M%p')    
 
     if 4 <= game_day_int <= 20 or 24 <= game_day_int <= 30:
         game_day_txt += "th"
