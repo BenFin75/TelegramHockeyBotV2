@@ -15,6 +15,7 @@ def next(todays_date, time_zone, utc_tz):
         if race_date >= todays_date:
             track_name = race['Circuit']['CircuitName']
             start_time = json.dumps(race['Time'])
+            start_time = start_time.replace('"', '')
             start_time = start_time.replace('T', ' ')
             start_time = start_time.replace('Z', '')
             start_time_obj = datetime.fromisoformat(start_time).replace(tzinfo=utc_tz)

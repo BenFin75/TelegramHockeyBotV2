@@ -31,6 +31,7 @@ def check(number_of_teams, team_data, time_zone, utc_tz):
             team_data['dates'][0]['games'][number_of_teams]['teams']['home']['leagueRecord']['losses'])
         game_fulltime = json.dumps(
             team_data['dates'][0]['games'][number_of_teams]['gameDate'])
+        game_fulltime = game_fulltime.replace('"', '')
         game_fulltime = game_fulltime.replace('T', ' ')
         game_fulltime = game_fulltime.replace('Z', '')
         game_time_obj = datetime.fromisoformat(game_fulltime).replace(tzinfo=utc_tz)

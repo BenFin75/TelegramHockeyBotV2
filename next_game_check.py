@@ -86,6 +86,7 @@ def build_message(next_game, time_zone, utc_tz):
     game_day_int = int(game_day_str)
     game_day_txt = str(game_day_int)
     game_day_of_week = datetime.strftime(game_day_obj, '%A')
+    game_fulltime = game_fulltime.replace('"', '')
     game_fulltime = game_fulltime.replace('T', ' ')
     game_fulltime = game_fulltime.replace('Z', '')
     game_time_obj = datetime.fromisoformat(game_fulltime).replace(tzinfo=utc_tz)
