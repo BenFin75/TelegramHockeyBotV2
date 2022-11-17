@@ -59,12 +59,10 @@ jobs.start
 # set the database paths so the bot works on any OS.
 chat_database_win = PureWindowsPath('.\database\chat_database.csv')
 teams_database_win = PureWindowsPath('.\database\\team_names.csv')
-todays_games_database_win = PureWindowsPath('.\database\\todays_games.csv')
 
 # OS-independent paths
 chat_database = Path(chat_database_win)
 teams_database = Path(teams_database_win)
-todays_games_database = Path(todays_games_database_win)
 
 # ran when bot if first added, returns instructions for setting the bot up
 def start(update, context):
@@ -168,7 +166,7 @@ def test_daily_notifications(update, context):
     if chat_id == admin_chat_id:
         send(updater, chat_id, 'Testing Daily Time Notifications')
         runtime = datetime.now(time_zone) + timedelta(seconds=30)
-        daily_notifications.test(updater, chat_database, todays_games_database, time_zone, utc_tz, jobs, runtime)
+        daily_notifications.test(updater, chat_database, time_zone, utc_tz, jobs, runtime)
     else:
         return
 
@@ -211,7 +209,7 @@ def unknown(update, context):
 
 def start_notifications():
     runtime = time(8, 00, 00, 0000, tzinfo = time_zone)
-    daily_notifications.timer(updater, chat_database, todays_games_database, time_zone, utc_tz, jobs, runtime)
+    daily_notifications.timer(updater, chat_database, time_zone, utc_tz, jobs, runtime)
     game_time_notifications.timer(updater, jobs, chat_database, runtime)
     
 start_notifications()
