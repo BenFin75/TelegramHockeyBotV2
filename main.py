@@ -32,7 +32,7 @@ import unknown_message
 
 # global variables for the bot
 time_zone = pytz.timezone('US/Eastern')
-utc_tz = pytz.timezone('US/Eastern')
+utc_tz = pytz.timezone('UTC')
 todays_date = datetime.now(time_zone).date()
 dst_check = bool(datetime.now(time_zone))
 
